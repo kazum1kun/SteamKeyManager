@@ -15,7 +15,6 @@ public class Driver extends JApplet
         tPane = new JTabbedPane();
 
         tPane.addTab("Add", keyWriter);
-        ggggg
         getContentPane().add(tPane);
         setSize(800, 310);
     }
