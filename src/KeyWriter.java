@@ -1,7 +1,6 @@
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,94 +10,83 @@ import java.util.Vector;
 /**
  * Created by Kazumi on 10:32 PM, 2/18/2016. Powered by JDK 1_8_0 and IntelliJ IDEA 15.
  */
-public class KeyWriter extends JPanel implements ActionListener, ListSelectionListener
+class KeyWriter extends JPanel implements ActionListener, ListSelectionListener
 {
-    JButton butOpen, butAdd, butSave, butRemove;
-    JScrollPane scrollPane;
-    JList<String> keyList;
-    JTextField fldKey, fldName;
-    JLabel lblKey, lblName, lblFile;
-    JPanel buttPanel, mainPanel,upperPanel, inputPanel, textPanel, bottomPanel;
-    Vector<String> keyArray, pendingArray;
-    BufferedReader reader;
-    Box initBox;
-    CardLayout cl;
-    int selectedIndex;
-    File textFile;
+    private JButton butAdd, butSave, butRemove;
+    private JScrollPane scrollPane;
+    private JList<String> keyList;
+    private JTextField fldKey, fldName;
+    private JLabel lblKey, lblName, lblFile, lblPending;
+    private JPanel upperPanel, inputPanel, bottomPanel;
+    private JSeparator separator;
+    private Vector<String> keyArray, pendingArray;
+    private int selectedIndex;
+    private File textFile;
+    private Management mgmt;
 
-    KeyWriter()
+    KeyWriter(Management mgmt)
     {
-        setLayout(new CardLayout());
+        keyArray = Driver.getKeyArray();
+        textFile = Driver.getTextFile();
+        this.mgmt = mgmt;
 
-        keyArray = new Vector<>();
         pendingArray = new Vector<>();
 
-        butOpen = new JButton("Open a file...");
-        butSave = new JButton("Save changes");
+        butSave = new JButton("Commit changes");
         butAdd = new JButton("Add item");
         butRemove = new JButton("Remove item");
-
-        initBox = new Box(BoxLayout.Y_AXIS);
+        butAdd.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         lblKey = new JLabel("Key/URL: ");
         lblName = new JLabel("Game: ");
-        lblFile = new JLabel("Current file: ");
+        lblFile = new JLabel("Current file: " + textFile.getAbsolutePath());
+        lblPending = new JLabel("Keys to be added: ");
+        lblPending.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblFile.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         fldKey = new JTextField();
         fldName = new JTextField();
 
+        separator = new JSeparator();
+
         keyList = new JList<>(pendingArray);
 
         scrollPane = new JScrollPane(keyList);
-
-        buttPanel = new JPanel();
-        mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-        upperPanel = new JPanel(new BorderLayout());
+        upperPanel = new JPanel();
+        upperPanel.setLayout(new BoxLayout(upperPanel, BoxLayout.Y_AXIS));
         inputPanel = new JPanel(new GridLayout(2,2));
-        textPanel = new JPanel();
         bottomPanel = new JPanel();
-
-        buttPanel.add(butOpen);
-        initBox.add(Box.createVerticalGlue());
-        initBox.add(buttPanel);
-        initBox.add(Box.createVerticalGlue());
+        setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
         inputPanel.add(lblName);
         inputPanel.add(fldName);
         inputPanel.add(lblKey);
         inputPanel.add(fldKey);
 
-        upperPanel.add(lblFile, BorderLayout.PAGE_START);
-        upperPanel.add(inputPanel, BorderLayout.CENTER);
-        upperPanel.add(butAdd, BorderLayout.SOUTH);
-
-        textPanel.add(scrollPane);
+        upperPanel.add(lblFile);
+        upperPanel.add(inputPanel);
+        upperPanel.add(butAdd);
 
         bottomPanel.add(butRemove);
         bottomPanel.add(butSave);
 
-        mainPanel.add(upperPanel);
-        mainPanel.add(textPanel);
-        mainPanel.add(bottomPanel);
+        add(upperPanel);
+        add(Box.createRigidArea(new Dimension(0, 5)));
+        add(separator);
+        add(lblPending);
+        add(scrollPane);
+        add(bottomPanel);
 
-        add(initBox, "INIT");
-        add(mainPanel, "MAIN");
 
-        butOpen.addActionListener(this);
         butAdd.addActionListener(this);
         butRemove.addActionListener(this);
         keyList.addListSelectionListener(this);
         butSave.addActionListener(this);
-
-        buttPanel.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-
-        cl = (CardLayout) getLayout();
-        cl.show(this,"INIT");
     }
 
     public void actionPerformed(ActionEvent e)
     {
+        /*
         if (e.getSource() == butOpen)
         {
             JFileChooser fileChooser = new JFileChooser("D:\\Dropbox\\Documents");
@@ -130,9 +118,10 @@ public class KeyWriter extends JPanel implements ActionListener, ListSelectionLi
                     cl.next(this);
                 }
             }
-        }
 
-        else if (e.getSource() == butAdd)
+        }*/
+
+        if (e.getSource() == butAdd)
         {
             pendingArray.addElement(fldKey.getText()+ "; " +fldName.getText());
             keyList.updateUI();
@@ -167,9 +156,9 @@ public class KeyWriter extends JPanel implements ActionListener, ListSelectionLi
             {
                 pendingArray.removeAllElements();
                 keyList.updateUI();
+                mgmt.getKeyList().updateUI();
             }
         }
-
     }
 
     public void valueChanged(ListSelectionEvent e)
