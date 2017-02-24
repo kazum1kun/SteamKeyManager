@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BusinessHelper.iml" filepath="$PROJECT_DIR$/BusinessHelper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SteamKeyManager.iml" filepath="$PROJECT_DIR$/SteamKeyManager.iml" />
     </modules>
   </component>
 </project>
