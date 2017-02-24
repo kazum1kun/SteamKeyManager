@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 public class Interface extends Application {
 
     // Core component: a TableView table showing all information
-    private TableView keyTable = new TableView();
+    private TableView<Key> keyTable = new TableView<>();
     // Core component: a ObservableList containing the actual data
     private ObservableList<Key> keyList = FileParser.get();
 
@@ -29,7 +29,7 @@ public class Interface extends Application {
         // Set up a new scene and set properties of the stage
         Scene scene = new Scene(new Group());
         primaryStage.setTitle("Steam Key Manager");
-        primaryStage.setWidth(500);
+        primaryStage.setWidth(515);
         primaryStage.setHeight(400);
 
         // And a label displaying the name of the app
@@ -54,6 +54,7 @@ public class Interface extends Application {
 
         keyTable.setItems(keyList);
         keyTable.getColumns().addAll(gameCol, keyCol, notesCol);
+        keyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         // A VBox to house the table
         VBox tableBox = new VBox();
