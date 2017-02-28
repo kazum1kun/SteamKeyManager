@@ -2,11 +2,13 @@
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -55,6 +57,12 @@ public class Interface extends Application {
         keyTable.getColumns().addAll(gameCol, keyCol, notesCol);
         keyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
+
+        // Implement cell editing
+        gameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        keyCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        notesCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
         // Add textFields to add a new key. Make them no wider than the table
         TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
@@ -70,6 +78,43 @@ public class Interface extends Application {
 
         // ...and a button
         Button addButton  = new Button("Add");
+
+        // Set listeners for column cells
+        gameCol.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
+                    @Override
+                    // Update the value of the game cell after users finish editing
+                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
+                        (event.getTableView().getItems().get(
+                                event.getTablePosition().getRow())
+                        ).setGame(event.getNewValue());
+                    }
+                }
+        );
+
+        keyCol.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
+                    @Override
+                    // Update the value of the game cell after users finish editing
+                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
+                        (event.getTableView().getItems().get(
+                                event.getTablePosition().getRow())
+                        ).setKey(event.getNewValue());
+                    }
+                }
+        );
+
+        notesCol.setOnEditCommit(
+                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
+                    @Override
+                    // Update the value of the game cell after users finish editing
+                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
+                        (event.getTableView().getItems().get(
+                                event.getTablePosition().getRow())
+                        ).setNotes(event.getNewValue());
+                    }
+                }
+        );
 
         // Set an lambda listener to button action
         addButton.setOnAction(event -> {
