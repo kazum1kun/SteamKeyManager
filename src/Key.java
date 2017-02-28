@@ -4,14 +4,14 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Key {
     // Fields to hold properties of the key
-    private SimpleStringProperty key;
     private SimpleStringProperty game;
+    private SimpleStringProperty key;
     private SimpleStringProperty notes;
 
     // Default constructor
-    Key(String key, String game, String notes){
-        this.key = new SimpleStringProperty(key);
+    Key(String game, String key, String notes){
         this.game = new SimpleStringProperty(game);
+        this.key = new SimpleStringProperty(key);
         this.notes = new SimpleStringProperty(notes);
     }
 

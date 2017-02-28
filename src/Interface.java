@@ -2,8 +2,6 @@
 
 import javafx.application.Application;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -31,24 +29,11 @@ public class Interface extends Application {
         Scene scene = new Scene(new Group());
         primaryStage.setTitle("Steam Key Manager");
         primaryStage.setWidth(515);
-        primaryStage.setHeight(400);
+        primaryStage.setHeight(515);
 
         // And a label displaying the name of the app
         Label appNameLabel = new Label("Steam Key Manager");
         appNameLabel.setFont(new Font("Segoe UI", 20));
-
-        // Add textFields to add a new key
-        TextField gameField = new TextField();
-        gameField.setPromptText("Game");
-
-        TextField keyField = new TextField();
-        keyField.setPromptText("Key");
-
-        TextField noteField = new TextField();
-        noteField.setPromptText("Notes");
-
-        // ...and a button
-        Button addButton  = new Button("Add");
 
         // Make table editable
         keyTable.setEditable(true);
@@ -70,23 +55,52 @@ public class Interface extends Application {
         keyTable.getColumns().addAll(gameCol, keyCol, notesCol);
         keyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Set an listener to button action
-        addButton.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                // Create a new Key object and add to keyList
-                keyList.add(new Key(
-                        keyField.getText(),
-                        gameField.getText(),
-                        noteField.getText()
-                ));
-                // Clear input fields
-                keyField.clear();
-                gameField.clear();
-                noteField.clear();
+        // Add textFields to add a new key. Make them no wider than the table
+        TextField gameField = new TextField();
+        gameField.setMaxWidth(gameCol.getMaxWidth());
+        gameField.setPromptText("Game");
 
-            }
+        TextField keyField = new TextField();
+        keyField.setMaxWidth(keyCol.getMaxWidth());
+        keyField.setPromptText("Key");
+
+        TextField noteField = new TextField();
+        noteField.setMaxWidth(notesCol.getPrefWidth());
+        noteField.setPromptText("Notes");
+
+        // ...and a button
+        Button addButton  = new Button("Add");
+
+        // Set an lambda listener to button action
+        addButton.setOnAction(event -> {
+            // Create a new Key and add it to keyList
+            keyList.add(new Key(
+                    gameField.getText(),
+                    keyField.getText(),
+                    noteField.getText()
+            ));
+            // Clear input fields
+            gameField.clear();
+            keyField.clear();
+            noteField.clear();
         });
+        // Set an listener to button action
+        // addButton.setOnAction(new EventHandler<ActionEvent>() {
+        //    @Override
+        //    public void handle(ActionEvent event) {
+                // Create a new Key object and add to keyList
+        //        keyList.add(new Key(
+        //                keyField.getText(),
+        //                gameField.getText(),
+        //                noteField.getText()
+        //        ));
+        //        // Clear input fields
+        //        keyField.clear();
+        //        gameField.clear();
+        //        noteField.clear();
+
+        //    }
+        //});
 
         // A VBox to house the table
         VBox tableBox = new VBox();
