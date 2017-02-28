@@ -1,7 +1,9 @@
 // Main interface of the Key Manager
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
@@ -13,6 +15,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class Interface extends Application {
 
@@ -129,23 +132,29 @@ public class Interface extends Application {
             keyField.clear();
             noteField.clear();
         });
-        // Set an listener to button action
-        // addButton.setOnAction(new EventHandler<ActionEvent>() {
-        //    @Override
-        //    public void handle(ActionEvent event) {
-                // Create a new Key object and add to keyList
-        //        keyList.add(new Key(
-        //                keyField.getText(),
-        //                gameField.getText(),
-        //                noteField.getText()
-        //        ));
-        //        // Clear input fields
-        //        keyField.clear();
-        //        gameField.clear();
-        //        noteField.clear();
 
-        //    }
-        //});
+        // Context menu for rows
+        keyTable.setRowFactory(new Callback<TableView<Key>, TableRow<Key>>() {
+            @Override
+            public TableRow<Key> call(TableView<Key> tableView) {
+                final TableRow<Key> row = new TableRow<>();
+                final ContextMenu cm = new ContextMenu();
+                final MenuItem removeRowItem = new MenuItem("Remove");
+                // Listener for removing a row
+                removeRowItem.setOnAction((ActionEvent event) -> {
+                    keyTable.getItems().remove(row.getItem());
+                });
+                cm.getItems().add(removeRowItem);
+
+                // Set the remove option only show when the row is not empty
+                row.contextMenuProperty().bind(
+                        Bindings.when(row.emptyProperty())
+                        .then((ContextMenu)null)
+                        .otherwise(cm)
+                );
+                return row;
+            }
+        });
 
         // A VBox to house the table
         VBox tableBox = new VBox();
