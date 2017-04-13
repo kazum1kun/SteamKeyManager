@@ -1,5 +1,3 @@
-// Main interface of the Key Manager
-
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -17,6 +15,12 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+/**
+ * Main interface class of the Steam Key Manager
+ *
+ * @author Xuanli Lin
+ * @version 0.0.2-alpha
+ */
 public class Interface extends Application {
 
     // Core component: a TableView table showing all information
@@ -149,8 +153,8 @@ public class Interface extends Application {
                 // Set the remove option only show when the row is not empty
                 row.contextMenuProperty().bind(
                         Bindings.when(row.emptyProperty())
-                        .then((ContextMenu)null)
-                        .otherwise(cm)
+                                .then((ContextMenu)null)
+                                .otherwise(cm)
                 );
                 return row;
             }

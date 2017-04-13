@@ -1,7 +1,11 @@
-// Class for individual key data
-
 import javafx.beans.property.SimpleStringProperty;
 
+/**
+ * Class representing individual entries
+ *
+ * @author Xuanli Lin
+ * @version 0.0.2-alpha
+ */
 public class Key {
     // Fields to hold properties of the key
     private SimpleStringProperty game;
@@ -21,20 +25,20 @@ public class Key {
         return key.get();
     }
 
-    public String getGame() {
-        return game.get();
-    }
-
-    public String getNotes() {
-        return notes.get();
-    }
-
     public void setKey(String key) {
         this.key.set(key);
     }
 
+    public String getGame() {
+        return game.get();
+    }
+
     public void setGame(String game) {
         this.game.set(game);
+    }
+
+    public String getNotes() {
+        return notes.get();
     }
 
     public void setNotes(String notes) {
