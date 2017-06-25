@@ -144,11 +144,35 @@ public class Interface extends Application {
         // Set an lambda listener to button action
         addButton.setOnAction(event -> {
             // Create a new Key and add it to keyList
-            keyList.add(new Key(
+            Key key = new Key(
                     gameField.getText(),
                     keyField.getText(),
                     noteField.getText()
-            ));
+            );
+            keyList.add(key);
+
+            // Database Test
+//            try {
+//                KeyDao mysql = new KeyDao(Utils.DBTool.MYSQL);
+//                KeyDao sqlite = new KeyDao(Utils.DBTool.SQLITE);
+//
+////                mysql.insertKey(key);
+////                sqlite.insertKey(key);
+//
+////                String oldkey = "AAAAA-BBBBB-CCCCC";
+////                String newkey = "11111-22222-33333";
+////                mysql.updateKey(oldkey, newkey);
+////                sqlite.updateKey(oldkey, newkey);
+////                mysql.updateData(key);
+////                sqlite.updateData(key);
+////                mysql.delKey(key);
+////                sqlite.delKey(key);
+////                mysql.getAllKeys();
+////                sqlite.getAllKeys();
+//            } catch (SQLException e) {
+//                e.printStackTrace();
+//            }
+
             // Clear input fields
             gameField.clear();
             keyField.clear();
