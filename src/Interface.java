@@ -19,7 +19,7 @@ import javafx.util.Callback;
  * Main interface class of the Steam Key Manager
  *
  * @author Xuanli Lin
- * @version 0.0.2-alpha
+ * @version 0.0.5-alpha
  */
 public class Interface extends Application {
 
@@ -180,5 +180,56 @@ public class Interface extends Application {
         // Finalize the settings
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+}
+
+final class ShowPrompt {
+    // Prompt for to file I/O errors
+    static void fileReadError(String pathToFile, int context) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Fatal Error");
+        alert.setHeaderText("An fatal error has occurred");
+        if (context == 1) {
+            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
+                    "Please make sure the file exists and SKM has permissions to access it.");
+        }
+        if (context == 2) {
+            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
+                    "Please make sure SKM has permissions to access it, and it is not in use by another program.");
+        }
+        alert.showAndWait();
+    }
+
+    // Prompt for parsing errors
+    static void fileParseError(String pathToFile, int context) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("File Parse Error");
+        alert.setHeaderText("An parsing error has occurred");
+        if (context == 1) {
+            alert.setContentText("Steam Key Manager has recognized the format of the file, " +
+                    "but unable to parse the content. Make sure the file is not in use by another program.");
+        }
+
+        alert.showAndWait();
+    }
+
+    // Prompt to ask whether user want to analyze the file
+    static boolean oldFormat() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Unrecognized Format");
+        alert.setHeaderText("Old or unrecognized format");
+        alert.setContentText("Steam Key Manager was unable to recognize the format of the file." +
+                "Do you want SKM to attempt to analyze the file?");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        return (alert.showAndWait().get() == ButtonType.YES);
+    }
+
+    // Alert user if SKM cannot detect a pattern
+    static void cantDetect() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Failed to Analyze");
+        alert.setHeaderText("");
+        alert.setContentText("Steam Key Manager has failed to analyze the file. The program will now exit.");
+        alert.showAndWait();
     }
 }

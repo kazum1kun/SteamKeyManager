@@ -2,9 +2,10 @@ import javafx.beans.property.SimpleStringProperty;
 
 /**
  * Class representing individual entries
+ * Key format version 1
  *
  * @author Xuanli Lin
- * @version 0.0.2-alpha
+ * @version 0.0.5-alpha
  */
 public class Key {
     // Fields to hold properties of the key
