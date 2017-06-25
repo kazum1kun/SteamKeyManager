@@ -45,4 +45,13 @@ public class Key {
     public void setNotes(String notes) {
         this.notes.set(notes);
     }
+
+    @Override
+    public String toString() {
+        return "Key{" +
+                "game=" + game +
+                ", key=" + key +
+                ", notes=" + notes +
+                '}';
+    }
 }
