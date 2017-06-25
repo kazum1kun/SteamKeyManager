@@ -18,7 +18,7 @@ As of now, the Steam Key Manager supports:
 Here's a list of planned updates to the manager (priority ones marked in **bold**):
 - **Search** (coming in 0.1.0)
 - Copy/paste keys from the list (coming in 0.1.0)
-- ***File picker / Data parser*** (coming in 0.1.0)
+- ***File picker / Data parser*** (almost finished, pending testing)
 - Remark entries (e.g. important, for trade, redeemed)
 - Warning dialog popup (coming in 0.1.0)
 - Bug fixes
@@ -30,6 +30,15 @@ I know for sure that my codes are still not perfect. Feel free to commend upon t
 Due to its immature nature I will not release a Java executable version of the manager for now.
 
 # Changelog
+## Jun 25, 2017
+Version 0.0.5-alpha
+
+The file parser is almost ready and I am testing it. My friend has brought up an idea about the data storage
+and I am really interested in it. Essentially it's storing the keys into a SQL database instead of a plain text
+file. If it is proved viable I will work with him and implement it in upcoming releases.
+
+Today's update also include improved UI, especially those dialogs and warnings.
+
 ## Apr 13, 2017
 I have reverted a major commit made on March. 
 

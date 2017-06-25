@@ -13,27 +13,45 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.Callback;
+
+import java.io.File;
 
 /**
  * Main interface class of the Steam Key Manager
  *
  * @author Xuanli Lin
- * @version 0.0.2-alpha
+ * @version 0.0.5-alpha
  */
 public class Interface extends Application {
 
     // Core component: a TableView table showing all information
-    private TableView<Key> keyTable = new TableView<>();
+    private static TableView<Key> keyTable = new TableView<>();
     // Core component: a ObservableList containing the actual data
-    private ObservableList<Key> keyList = FileParser.get();
+    private static ObservableList<Key> keyList;
+    // The File user chosen
+    private static File userTextFile;
 
     public static void main(String[] args) {
         launch(args);
     }
 
+    // Prompt user to pick a file before SKM starts. Parse the file if possible. If no file is chosen, start SKM with
+    // blank key list
+    private static void prepareKeyList(Stage stage) {
+        File temp = FileParser.chooseFile(stage);
+        if (temp != null) {
+            userTextFile = temp;
+            keyList = FileParser.parseAndGet(temp);
+        } else {
+            keyList = FileParser.getEmpty();
+        }
+    }
+
     @Override
     public void start(Stage primaryStage) {
+        // Prepare the key list before program starts
+        prepareKeyList(primaryStage);
+
         // Set up a new scene and set properties of the stage
         Scene scene = new Scene(new Group());
         primaryStage.setTitle("Steam Key Manager");
@@ -138,26 +156,21 @@ public class Interface extends Application {
         });
 
         // Context menu for rows
-        keyTable.setRowFactory(new Callback<TableView<Key>, TableRow<Key>>() {
-            @Override
-            public TableRow<Key> call(TableView<Key> tableView) {
-                final TableRow<Key> row = new TableRow<>();
-                final ContextMenu cm = new ContextMenu();
-                final MenuItem removeRowItem = new MenuItem("Remove");
-                // Listener for removing a row
-                removeRowItem.setOnAction((ActionEvent event) -> {
-                    keyTable.getItems().remove(row.getItem());
-                });
-                cm.getItems().add(removeRowItem);
+        keyTable.setRowFactory(tableView -> {
+            final TableRow<Key> row = new TableRow<>();
+            final ContextMenu cm = new ContextMenu();
+            final MenuItem removeRowItem = new MenuItem("Remove");
+            // Listener for removing a row
+            removeRowItem.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
+            cm.getItems().add(removeRowItem);
 
-                // Set the remove option only show when the row is not empty
-                row.contextMenuProperty().bind(
-                        Bindings.when(row.emptyProperty())
-                                .then((ContextMenu)null)
-                                .otherwise(cm)
-                );
-                return row;
-            }
+            // Set the remove option only show when the row is not empty
+            row.contextMenuProperty().bind(
+                    Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(cm)
+            );
+            return row;
         });
 
         // A VBox to house the table
@@ -180,5 +193,57 @@ public class Interface extends Application {
         // Finalize the settings
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+}
+
+final class ShowPrompt {
+    // Prompt for to file I/O errors
+    static void fileReadError(String pathToFile, int context) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Fatal Error");
+        alert.setHeaderText("An fatal error has occurred");
+        if (context == 1) {
+            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
+                    "Please make sure the file exists and SKM has permissions to access it.");
+        }
+        if (context == 2) {
+            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
+                    "Please make sure SKM has permissions to access it, and it is not in use by another program.");
+        }
+        alert.showAndWait();
+    }
+
+    // Prompt for parsing errors
+    static void fileParseError(String pathToFile, int context) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("File Parse Error");
+        alert.setHeaderText("An parsing error has occurred");
+        if (context == 1) {
+            alert.setContentText("Steam Key Manager has recognized the format of the file, " +
+                    "but unable to parse the content. Make sure the file is not in use by another program.");
+        }
+
+        alert.showAndWait();
+    }
+
+    // Prompt to ask whether user want to analyze the file
+    static boolean oldFormat() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Unrecognized Format");
+        alert.setHeaderText("Old or unrecognized format");
+        alert.setContentText("Steam Key Manager was unable to recognize the format of the file. " +
+                "Do you want SKM to attempt to analyze the file?");
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
+        return (alert.showAndWait().get() == ButtonType.YES);
+    }
+
+    // Alert user if SKM cannot detect a pattern
+    static void analysisReport(int ok, int failed) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Analyze results");
+        alert.setHeaderText("SKM has finished analyzing the file");
+        alert.setContentText(ok + " valid Steam keys / redemption url was found.\n" +
+                +failed + " lines were failed to parse.");
+        alert.showAndWait();
     }
 }
