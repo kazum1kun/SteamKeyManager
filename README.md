@@ -8,19 +8,38 @@ If you are kind of person like me, this tool might come in handy for you, too.
 
 Though various improvements was made to this project, I still consider this WIP and some features are to be added when I'm free
 
+# How to Use
+Since the executable is not quite ready yet, you have to download the source code and compile it yourself. 
+
+You will see a file picker on SKM start. Pick an existing text file if you want to import, or hit Cancel if you want to
+start a new collection. If you selected a file, SKM will automatically detect SKM archives and import the keys in it. 
+If SKM cannot recognize the file, you can ask it to attempt parse the file and import the keys for you.
+
+Currently the file parser is very immature and can only recognize a very specific pattern of data:
+
+`AAAAA-BBBBB-CCCCC; Pseudo Game` or `Pseudo Game; AAAAA-BBBBB-CCCCC`
+
+I did attempt to include more delimiters into the SKM, but it ended up taking URLs apart, so I will come back to this later.
+
 # Functions
 As of now, the Steam Key Manager supports:
 - Add/Remove entries to the table
 - Add notes to entries
 - Sort by game or notes (or keys, if you prefer)
 - Edit an entry
+- Import keys from an existing text file
+- Intuitive, minimal and modern UI design
 
 Here's a list of planned updates to the manager (priority ones marked in **bold**):
 - **Search** (coming in 0.1.0)
-- Copy/paste keys from the list (coming in 0.1.0)
-- ***File picker / Data parser*** (almost finished, pending testing)
+- **Write to files**
+- Improved file parser (for Non-SKM formats)
+- Copy/paste keys from the list (being worked on)
 - Remark entries (e.g. important, for trade, redeemed)
-- Warning dialog popup (coming in 0.1.0)
+- Support for more formats
+    - @Dontcampy is working on SQL integration
+    - MS Excel (.xlsx)
+- Encrypting local storage
 - Bug fixes
 
 # Issues? 
@@ -32,12 +51,9 @@ Due to its immature nature I will not release a Java executable version of the m
 # Changelog
 ## Jun 25, 2017
 Version 0.0.5-alpha
-
-The file parser is almost ready and I am testing it. My friend has brought up an idea about the data storage
-and I am really interested in it. Essentially it's storing the keys into a SQL database instead of a plain text
-file. If it is proved viable I will work with him and implement it in upcoming releases.
-
-Today's update also include improved UI, especially those dialogs and warnings.
+- **You can now import a existing text file and let SKM parse it for keys**
+- Warning / info dialog added
+- Imported Gradle bundle to facilitate development
 
 ## Apr 13, 2017
 I have reverted a major commit made on March. 
