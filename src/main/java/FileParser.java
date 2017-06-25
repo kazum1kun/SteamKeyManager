@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,11 +19,12 @@ import java.util.regex.Pattern;
 
 public final class FileParser {
     private static final String VER1_HEADER = "SKM Data Format 1";
-    private static ObservableList<Key> keys;
+    private static ObservableList<Key> keys = FXCollections.observableArrayList();
+    private static int keyAndUrlFound = 0, unrecFound = 0;
 
-    public static File getFile(Stage stage) {
+    public static File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Please select a text file...");
+        fileChooser.setTitle("Please select a text file... (hit cancel to start a new collection)");
         fileChooser.setInitialDirectory(new File(
                 System.getProperty("user.home") + "/Desktop"));
         fileChooser.getExtensionFilters().addAll(
@@ -85,8 +85,9 @@ public final class FileParser {
     // File parser for unrecognized format
     private static void parseOld(File file) {
         // Define the pattern for a Steam key and a URL
-        Pattern steamKeyPattern = Pattern.compile("[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}");
-        Pattern urlPattern = Pattern.compile("https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)");
+        // I HATE REGEX!!!!
+        Pattern steamKeyPattern = Pattern.compile("[*]*[A-Z0-9]{5}-[A-Z0-9]{5}-[A-Z0-9]{5}");
+        Pattern urlPattern = Pattern.compile("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
         // Create another BufferedReader to start from the beginning
         try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
@@ -94,48 +95,68 @@ public final class FileParser {
             while ((line = br.readLine()) != null) {
                 // Split each line by the regex  delimiter (defined as a combination of punctuation(s) with possible
                 // whitespace(s). Hyphen (-) is not a valid delimiter for obvious reason.
-                List<String> tokens = Arrays.asList(line.split("[\\p{Punct}\\s]&&[^-]+"));
-                String keyToken, gameToken;
-                String firstToken = tokens.get(0);
-                String secondToken = tokens.get(1);
+                List<String> tokens = Arrays.asList(line.split("; "));
+                String keyToken = null, gameToken = null;
+                String firstToken = tokens.get(0).trim();
+                String secondToken = tokens.get(1).trim();
 
-                // If the first token matches the pattern of a Steam key...
+                // If the first token matches the pattern of a Steam key or a URL...
                 Matcher keyMatcher = steamKeyPattern.matcher(firstToken);
                 Matcher urlMatcher = urlPattern.matcher(firstToken);
-                if (keyMatcher.matches() || urlMatcher.matches()) {
+                if (keyMatcher.find() || urlMatcher.find()) {
                     keyToken = firstToken;
                     gameToken = secondToken;
-                } else {
+                    keyAndUrlFound++;
+                } else {    // If the second token matches the pattern of a Steam key or a URL...
                     keyMatcher = steamKeyPattern.matcher(secondToken);
                     urlMatcher = urlPattern.matcher(secondToken);
-                    if (keyMatcher.matches() || urlMatcher.matches()) {
+                    if (keyMatcher.find() || urlMatcher.find()) {
                         keyToken = secondToken;
                         gameToken = firstToken;
+                        keyAndUrlFound++;
                     } else {
-                        throw new IllegalArgumentException();
+                        unrecFound++;
                     }
                 }
+
+                // Add the key to the List
+                keys.add(new Key(gameToken, keyToken, ""));
             }
         } catch (FileNotFoundException ex) {
             ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
         } catch (IOException ex) {
             ShowPrompt.fileParseError(file.getAbsolutePath(), 1);
-        } catch (IllegalFormatException ex) {
-            ShowPrompt.cantDetect();
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            unrecFound++;
         }
+
+        ShowPrompt.analysisReport(keyAndUrlFound, unrecFound);
     }
 
     // TODO: rewrite get method here to reflect new change
     // TODO: TEST!!!
 
-    // Old proof-of-concept pre-populated ObservableList
     public static ObservableList<Key> get() {
-        ObservableList<Key> val =
-                FXCollections.observableArrayList(
-                        new Key("11111-22222-33333", "Puslum", ""),
-                        new Key("ABCDE-FGHIJ-KLMNO", "Asco", "Null"),
-                        new Key("QWERT-YUIOP-ASDFG", "HFHYFBYF", "FUKCD")
-                );
-        return val;
+        return keys;
     }
+
+    public static ObservableList<Key> parseAndGet(File file) {
+        parse(file);
+        return keys;
+    }
+
+    // Return an empty ObservableList if no file was chosen by user
+    public static ObservableList<Key> getEmpty() {
+        return keys;
+    }
+    // Old proof-of-concept pre-populated ObservableList
+//    public static ObservableList<Key> get() {
+//        ObservableList<Key> val =
+//                FXCollections.observableArrayList(
+//                        new Key("11111-22222-33333", "Puslum", ""),
+//                        new Key("ABCDE-FGHIJ-KLMNO", "Asco", "Null"),
+//                        new Key("QWERT-YUIOP-ASDFG", "HFHYFBYF", "FUKCD")
+//                );
+//        return val;
+//    }
 }
