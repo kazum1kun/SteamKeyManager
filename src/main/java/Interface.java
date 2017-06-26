@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -20,7 +22,7 @@ import java.io.File;
  * Main interface class of the Steam Key Manager
  *
  * @author Xuanli Lin
- * @version 0.0.5-alpha
+ * @version 0.0.5-1-alpha
  */
 public class Interface extends Application {
 
@@ -183,10 +185,38 @@ public class Interface extends Application {
         keyTable.setRowFactory(tableView -> {
             final TableRow<Key> row = new TableRow<>();
             final ContextMenu cm = new ContextMenu();
-            final MenuItem removeRowItem = new MenuItem("Remove");
+            final MenuItem removeRow = new MenuItem("Remove");
+            final MenuItem copyKey = new MenuItem("Copy Key");
+            final MenuItem copyKeyAndRemove = new MenuItem("Copy Key and Remove");
+
             // Listener for removing a row
-            removeRowItem.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
-            cm.getItems().add(removeRowItem);
+            removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
+
+            // Listener for copying a key
+            copyKey.setOnAction((ActionEvent event) -> {
+                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                final ClipboardContent content = new ClipboardContent();
+                int selectedRow = keyTable.getSelectionModel().getSelectedIndex();
+
+                String key = keyTable.getItems().get(selectedRow).getKey();
+                content.putString(key);
+                clipboard.setContent(content);
+            });
+
+            // Listener for copying a key then delete the row
+            copyKeyAndRemove.setOnAction((ActionEvent event) -> {
+                final Clipboard clipboard = Clipboard.getSystemClipboard();
+                final ClipboardContent content = new ClipboardContent();
+                int selectedRow = keyTable.getSelectionModel().getSelectedIndex();
+
+                String key = keyTable.getItems().get(selectedRow).getKey();
+                content.putString(key);
+                clipboard.setContent(content);
+                keyTable.getItems().remove(row.getItem());
+            });
+
+            // Assemble the menu
+            cm.getItems().addAll(removeRow, copyKey, copyKeyAndRemove);
 
             // Set the remove option only show when the row is not empty
             row.contextMenuProperty().bind(
