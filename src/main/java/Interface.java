@@ -34,8 +34,8 @@ public class Interface extends Application {
     private static ObservableList<Key> keyList;
     // The File user chosen
     private static File userTextFile;
-    // Current language, default to en
-    private static Locale currentLocale = Locale.ENGLISH;
+    // Current language, default to system locale (EN if unsupported)
+    private static Locale currentLocale = L10N.getDefaultLocale();
     // Default resource bundle
     private static ResourceBundle lang = null;
 
@@ -138,10 +138,14 @@ public class Interface extends Application {
         RadioMenuItem simpChineseItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_zh_CN");
         simpChineseItem.setUserData(Locale.SIMPLIFIED_CHINESE);
         simpChineseItem.setToggleGroup(langGroup);
+        // ------------ Japanese (WIP)
+        RadioMenuItem japaneseItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_ja");
+        japaneseItem.setUserData(Locale.JAPANESE);
+        japaneseItem.setToggleGroup(langGroup);
         // Default to English
         englishItem.setSelected(true);
         // Assemble the Language menu
-        langMenu.getItems().addAll(englishItem, simpChineseItem);
+        langMenu.getItems().addAll(englishItem, simpChineseItem, japaneseItem);
         // Assemble Edit menu
         editMenu.getItems().addAll(langMenu);
 
@@ -286,7 +290,7 @@ public class Interface extends Application {
 //            final MenuItem copyKey = new MenuItem(lang.getString("string_contextMenu_copy"));
 //            final MenuItem copyKeyAndRemove = new MenuItem(lang.getString("string_contextMenu_copyAndRemove"));
             final MenuItem removeRow = L10N.menuItemForKey("string_contextMenu_remove");
-            final MenuItem copyKey = L10N.menuForKey("string_contextMenu_copy");
+            final MenuItem copyKey = L10N.menuItemForKey("string_contextMenu_copy");
             final MenuItem copyKeyAndRemove = L10N.menuItemForKey("string_contextMenu_copyAndRemove");
 
             // Listener for removing a row

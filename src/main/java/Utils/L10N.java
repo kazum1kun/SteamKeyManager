@@ -36,7 +36,7 @@ public final class L10N {
      * @return List of Locale objects.
      */
     public static List<Locale> getSupportedLocales() {
-        return new ArrayList<>(Arrays.asList(Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE));
+        return new ArrayList<>(Arrays.asList(Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.JAPANESE));
     }
 
     /**
