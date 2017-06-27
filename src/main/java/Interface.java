@@ -15,6 +15,8 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * Main interface class of the Steam Key Manager
@@ -49,32 +51,35 @@ public class Interface extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Multi-Language support
+        ResourceBundle lang = ResourceBundle.getBundle("language.lang", Locale.ENGLISH);
+
         // Prepare the key list before program starts
         prepareKeyList(primaryStage);
 
         // Set up a new scene and set properties of the stage
         Scene scene = new Scene(new Group());
-        primaryStage.setTitle("Steam Key Manager");
+        primaryStage.setTitle(lang.getString("APP_NAME"));
         primaryStage.setWidth(515);
         primaryStage.setHeight(515);
 
         // And a label displaying the name of the app
-        Label appNameLabel = new Label("Steam Key Manager");
+        Label appNameLabel = new Label(lang.getString("APP_NAME"));
         appNameLabel.setFont(new Font("Segoe UI", 20));
 
         // Make table editable
         keyTable.setEditable(true);
 
         // Add columns to the table and associate them with ObservableList
-        TableColumn gameCol = new TableColumn("Game");
+        TableColumn gameCol = new TableColumn(lang.getString("TXT_GAME"));
         gameCol.setMinWidth(200);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
 
-        TableColumn keyCol = new TableColumn("Key");
+        TableColumn keyCol = new TableColumn(lang.getString("TXT_KEY"));
         keyCol.setMinWidth(200);
         keyCol.setCellValueFactory(new PropertyValueFactory<Key, String>("key"));
 
-        TableColumn notesCol = new TableColumn("Notes");
+        TableColumn notesCol = new TableColumn(lang.getString("TXT_NOTES"));
         notesCol.setMaxWidth(100);
         notesCol.setCellValueFactory(new PropertyValueFactory<Key, String>("notes"));
 
@@ -91,18 +96,18 @@ public class Interface extends Application {
         // Add textFields to add a new key. Make them no wider than the table
         TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
-        gameField.setPromptText("Game");
+        gameField.setPromptText(lang.getString("TXT_GAME"));
 
         TextField keyField = new TextField();
         keyField.setMaxWidth(keyCol.getMaxWidth());
-        keyField.setPromptText("Key");
+        keyField.setPromptText(lang.getString("TXT_KEY"));
 
         TextField noteField = new TextField();
         noteField.setMaxWidth(notesCol.getPrefWidth());
-        noteField.setPromptText("Notes");
+        noteField.setPromptText(lang.getString("TXT_NOTES"));
 
         // ...and a button
-        Button addButton  = new Button("Add");
+        Button addButton  = new Button(lang.getString("TXT_ADD"));
 
         // Set listeners for column cells
         gameCol.setOnEditCommit(
@@ -183,7 +188,7 @@ public class Interface extends Application {
         keyTable.setRowFactory(tableView -> {
             final TableRow<Key> row = new TableRow<>();
             final ContextMenu cm = new ContextMenu();
-            final MenuItem removeRowItem = new MenuItem("Remove");
+            final MenuItem removeRowItem = new MenuItem(lang.getString("TXT_REMOVE"));
             // Listener for removing a row
             removeRowItem.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
             cm.getItems().add(removeRowItem);
