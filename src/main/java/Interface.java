@@ -190,11 +190,10 @@ public class Interface extends Application {
         keyTable.setRowFactory(tableView -> {
             final TableRow<Key> row = new TableRow<>();
             final ContextMenu cm = new ContextMenu();
-            final MenuItem removeRow = new MenuItem("Remove");
-            final MenuItem copyKey = new MenuItem("Copy Key");
-            final MenuItem copyKeyAndRemove = new MenuItem("Copy Key and Remove");
+            final MenuItem removeRow = new MenuItem("TXT_REMOVE");
+            final MenuItem copyKey = new MenuItem("TXT_COPY");
+            final MenuItem copyKeyAndRemove = new MenuItem("TXT_COPYANDREMOVE");
 
-            // final MenuItem removeRowItem = new MenuItem(lang.getString("TXT_REMOVE"));
             // Listener for removing a row
             removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
 
