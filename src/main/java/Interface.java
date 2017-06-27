@@ -1,10 +1,10 @@
+import Utils.L10N;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -34,6 +34,10 @@ public class Interface extends Application {
     private static ObservableList<Key> keyList;
     // The File user chosen
     private static File userTextFile;
+    // Current language, default to en
+    private static Locale currentLocale = Locale.ENGLISH;
+    // Default resource bundle
+    private static ResourceBundle lang = null;
 
     public static void main(String[] args) {
         launch(args);
@@ -51,37 +55,124 @@ public class Interface extends Application {
         }
     }
 
+    private static void updateLocale(Stage stage, TextField... textFields) {
+        // This would set locale for most areas
+        lang = ResourceBundle.getBundle("language.lang", currentLocale);
+        L10N.setLocale(currentLocale);
+
+        // Some cannot be set (for now), update them manually
+        // APP TITLE
+        stage.setTitle(lang.getString("string_mainUI_app_name"));
+
+        // TextField prompts
+        textFields[0].setPromptText(lang.getString("string_mainUI_game"));
+        textFields[1].setPromptText(lang.getString("string_mainUI_key"));
+        textFields[2].setPromptText(lang.getString("string_mainUI_notes"));
+
+    }
+
     @Override
     public void start(Stage primaryStage) {
         // Multi-Language support
-        ResourceBundle lang = ResourceBundle.getBundle("language.lang", Locale.ENGLISH);
+        lang = ResourceBundle.getBundle("language.lang", currentLocale);
 
-        // Prepare the key list before program starts
-        prepareKeyList(primaryStage);
+        // Populate an empty ObservableList on program start
+        keyList = FileParser.getEmpty();
+
+        // Some declarations here for you dumb Java
+        TextField gameField = new TextField();
+        TextField keyField = new TextField();
+        TextField notesField = new TextField();
 
         // Set up a new scene and set properties of the stage
-        Scene scene = new Scene(new Group());
-        primaryStage.setTitle(lang.getString("APP_NAME"));
-        primaryStage.setWidth(515);
-        primaryStage.setHeight(515);
+        Scene scene = new Scene(new VBox());
+        // TODO change locale of this manually
+        primaryStage.setTitle(lang.getString("string_mainUI_app_name"));
+        primaryStage.setWidth(600);
+        primaryStage.setHeight(600);
 
         // And a label displaying the name of the app
-        Label appNameLabel = new Label(lang.getString("APP_NAME"));
+//        Label appNameLabel = new Label(lang.getString("string_mainUI_app_name"));
+        Label appNameLabel = L10N.labelForKey("string_mainUI_app_name");
         appNameLabel.setFont(new Font("Segoe UI", 20));
 
         // Make table editable
         keyTable.setEditable(true);
 
+        // MenuBar is here!
+        MenuBar menuBar = new MenuBar();
+
+        // ---- File
+//        Menu fileMenu = new Menu(lang.getString("string_menuBar_file"));
+        Menu fileMenu = L10N.menuForKey("string_menuBar_file");
+        // -------- Open
+//        MenuItem openItem = new MenuItem(lang.getString("string_menuBar_file_open"));
+        MenuItem openItem = L10N.menuItemForKey("string_menuBar_file_open");
+        openItem.setOnAction((ActionEvent event) -> prepareKeyList(primaryStage));
+        // -------- Save
+//        MenuItem saveItem = new MenuItem(lang.getString("string_menuBar_file_save"));
+        MenuItem saveItem = L10N.menuItemForKey("string_menuBar_file_save");
+        // TODO : Implement save functionality
+        // -------- Exit
+//        MenuItem closeItem = new MenuItem(lang.getString("string_menuBar_file_exit"));
+        MenuItem closeItem = L10N.menuItemForKey("string_menuBar_file_exit");
+        // TODO: prompt user to confirm exit
+        // Assemble the File Menu
+        fileMenu.getItems().addAll(openItem, saveItem, closeItem);
+
+        // ---- Edit
+//        Menu editMenu = new Menu(lang.getString("string_menuBar_edit"));
+        Menu editMenu = L10N.menuForKey("string_menuBar_edit");
+
+        // -------- Language
+//        Menu langMenu = new Menu(lang.getString("string_menuBar_edit_language"));
+        Menu langMenu = L10N.menuForKey("string_menuBar_edit_language");
+        final ToggleGroup langGroup = new ToggleGroup();
+        // ------------ English
+//        RadioMenuItem englishItem = new RadioMenuItem(lang.getString("string_menuBar_edit_language_en"));
+        RadioMenuItem englishItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_en");
+        englishItem.setUserData(Locale.ENGLISH);
+        englishItem.setToggleGroup(langGroup);
+        // ------------ Chinese Simplified
+//        RadioMenuItem simpChineseItem = new RadioMenuItem(lang.getString("string_menuBar_edit_language_zh_CN"));
+        RadioMenuItem simpChineseItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_zh_CN");
+        simpChineseItem.setUserData(Locale.SIMPLIFIED_CHINESE);
+        simpChineseItem.setToggleGroup(langGroup);
+        // Default to English
+        englishItem.setSelected(true);
+        // Assemble the Language menu
+        langMenu.getItems().addAll(englishItem, simpChineseItem);
+        // Assemble Edit menu
+        editMenu.getItems().addAll(langMenu);
+
+        // Listener for Language menu
+        langGroup.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                currentLocale = (Locale) langGroup.getSelectedToggle().getUserData();
+            } catch (NullPointerException ex) {
+                System.out.println("Some weird problem happened while switching language. Not a big deal though.");
+            }
+            updateLocale(primaryStage, gameField, keyField, notesField);
+        });
+
+
+        // Assemble the menu bar
+        menuBar.getMenus().addAll(fileMenu, editMenu);
+
+
         // Add columns to the table and associate them with ObservableList
-        TableColumn gameCol = new TableColumn(lang.getString("TXT_GAME"));
+//        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
+        TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
         gameCol.setMinWidth(200);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
 
-        TableColumn keyCol = new TableColumn(lang.getString("TXT_KEY"));
+//        TableColumn keyCol = new TableColumn(lang.getString("string_mainUI_key"));
+        TableColumn keyCol = L10N.tableColumnForKey("string_mainUI_key");
         keyCol.setMinWidth(200);
         keyCol.setCellValueFactory(new PropertyValueFactory<Key, String>("key"));
 
-        TableColumn notesCol = new TableColumn(lang.getString("TXT_NOTES"));
+//        TableColumn notesCol = new TableColumn(lang.getString("string_mainUI_notes"));
+        TableColumn notesCol = L10N.tableColumnForKey("string_mainUI_notes");
         notesCol.setMaxWidth(100);
         notesCol.setCellValueFactory(new PropertyValueFactory<Key, String>("notes"));
 
@@ -96,20 +187,21 @@ public class Interface extends Application {
         notesCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         // Add textFields to add a new key. Make them no wider than the table
-        TextField gameField = new TextField();
+        // TODO update those manually
+//        TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
-        gameField.setPromptText(lang.getString("TXT_GAME"));
-
-        TextField keyField = new TextField();
+        gameField.setPromptText(lang.getString("string_mainUI_game"));
+//        TextField keyField = new TextField();
         keyField.setMaxWidth(keyCol.getMaxWidth());
-        keyField.setPromptText(lang.getString("TXT_KEY"));
+        keyField.setPromptText(lang.getString("string_mainUI_key"));
 
-        TextField noteField = new TextField();
-        noteField.setMaxWidth(notesCol.getPrefWidth());
-        noteField.setPromptText(lang.getString("TXT_NOTES"));
+//        TextField notesField = new TextField();
+        notesField.setMaxWidth(notesCol.getPrefWidth());
+        notesField.setPromptText(lang.getString("string_mainUI_notes"));
 
         // ...and a button
-        Button addButton = new Button(lang.getString("TXT_ADD"));
+//        Button addButton = new Button(lang.getString("string_mainUI_add"));
+        Button addButton = L10N.buttonForKey("string_mainUI_add");
 
         // Set listeners for column cells
         gameCol.setOnEditCommit(
@@ -154,7 +246,7 @@ public class Interface extends Application {
             Key key = new Key(
                     gameField.getText(),
                     keyField.getText(),
-                    noteField.getText()
+                    notesField.getText()
             );
             keyList.add(key);
 
@@ -183,16 +275,19 @@ public class Interface extends Application {
             // Clear input fields
             gameField.clear();
             keyField.clear();
-            noteField.clear();
+            notesField.clear();
         });
 
         // Context menu for rows
         keyTable.setRowFactory(tableView -> {
             final TableRow<Key> row = new TableRow<>();
             final ContextMenu cm = new ContextMenu();
-            final MenuItem removeRow = new MenuItem(lang.getString("TXT_REMOVE"));
-            final MenuItem copyKey = new MenuItem(lang.getString("TXT_COPY"));
-            final MenuItem copyKeyAndRemove = new MenuItem(lang.getString("TXT_COPYANDREMOVE"));
+//            final MenuItem removeRow = new MenuItem(lang.getString("string_contextMenu_remove"));
+//            final MenuItem copyKey = new MenuItem(lang.getString("string_contextMenu_copy"));
+//            final MenuItem copyKeyAndRemove = new MenuItem(lang.getString("string_contextMenu_copyAndRemove"));
+            final MenuItem removeRow = L10N.menuItemForKey("string_contextMenu_remove");
+            final MenuItem copyKey = L10N.menuForKey("string_contextMenu_copy");
+            final MenuItem copyKeyAndRemove = L10N.menuItemForKey("string_contextMenu_copyAndRemove");
 
             // Listener for removing a row
             removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
@@ -234,8 +329,9 @@ public class Interface extends Application {
 
         // A VBox to house the table
         VBox tableBox = new VBox();
-        // A Hbox to hold the add section
+        // A Hbox to hold the add section and the menu bar
         HBox addBox = new HBox();
+
 
         // Set properties and add components to VBox
         tableBox.setSpacing(5);
@@ -244,10 +340,10 @@ public class Interface extends Application {
 
         // Set properties and add components to HBox
         addBox.setSpacing(3);
-        addBox.getChildren().addAll(gameField, keyField, noteField, addButton);
+        addBox.getChildren().addAll(gameField, keyField, notesField, addButton);
 
         // Add VBox to scene
-        ((Group) scene.getRoot()).getChildren().addAll(tableBox);
+        ((VBox) scene.getRoot()).getChildren().addAll(menuBar, tableBox);
 
         // Finalize the settings
         primaryStage.setScene(scene);
@@ -255,6 +351,7 @@ public class Interface extends Application {
     }
 }
 
+// Todo rewrite this class with res bundle
 final class ShowPrompt {
     // Prompt for to file I/O errors
     static void fileReadError(String pathToFile, int context) {

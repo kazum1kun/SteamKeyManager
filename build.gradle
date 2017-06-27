@@ -1,5 +1,5 @@
 group 'com.linstreasure'
-version '0.0.5-alpha'
+version '0.0.5-1-alpha'
 
 apply plugin: 'java'
 
