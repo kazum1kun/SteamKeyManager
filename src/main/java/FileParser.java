@@ -11,20 +11,20 @@ import java.util.regex.Pattern;
 
 /**
  * Parse a txt file and return a corresponding ObservableList
- * Parser engine version 1
+ * Parser engine version 1, supports Key format version 1 and older format
  *
  * @author Xuanli Lin
  * @version 0.0.5-alpha
  */
 
 public final class FileParser {
-    private static final String VER1_HEADER = "SKM Data Format 1";
+    private static final String VER1_HEADER = "\uFEFFSKM Data Format 1";
     private static ObservableList<Key> keys = FXCollections.observableArrayList();
     private static int keyAndUrlFound = 0, unrecFound = 0;
 
     public static File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Please select a text file... (hit cancel to start a new collection)");
+        fileChooser.setTitle("Please select an existing collection");
         fileChooser.setInitialDirectory(new File(
                 System.getProperty("user.home") + "/Desktop"));
         fileChooser.getExtensionFilters().addAll(
@@ -37,7 +37,8 @@ public final class FileParser {
 
     // Read in the first line and decide what to do
     public static void parse(File file) {
-        try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(file), "utf-8"))) {
             String firstLine = br.readLine();
 
             // First case: the text file is of version 1 format
@@ -65,7 +66,9 @@ public final class FileParser {
     // File parser for format version 1
     private static void parseV1(File file) {
         // Create another BufferedReader to start from the beginning
-        try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
+        // NEW! UTF-8 support added
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(file), "utf-8"))) {
             // Omit the first line (which contains meta info)
             br.readLine();
 
@@ -73,7 +76,13 @@ public final class FileParser {
             String line;
             while ((line = br.readLine()) != null) {
                 List<String> key = Arrays.asList(line.split(";"));
-                keys.add(new Key(key.get(0), key.get(1), key.get(2)));
+                // If the notes are empty
+                if (key.size() < 3) {
+                    keys.add(new Key(key.get(0), key.get(1), ""));
+                } else {
+                    // Or notes are filled
+                    keys.add(new Key(key.get(0), key.get(1), key.get(2)));
+                }
             }
         } catch (FileNotFoundException ex) {
             ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
@@ -90,12 +99,19 @@ public final class FileParser {
         Pattern urlPattern = Pattern.compile("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]");
 
         // Create another BufferedReader to start from the beginning
-        try (BufferedReader br = new BufferedReader(new FileReader(file.getAbsoluteFile()))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(
+                new FileInputStream(file), "utf-8"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 // Split each line by the regex  delimiter (defined as a combination of punctuation(s) with possible
                 // whitespace(s). Hyphen (-) is not a valid delimiter for obvious reason.
                 List<String> tokens = Arrays.asList(line.split("; "));
+
+                // Omit the line if insufficient parameter was found
+                if (tokens.size() < 2) {
+                    unrecFound++;
+                    continue;
+                }
                 String keyToken = null, gameToken = null;
                 String firstToken = tokens.get(0).trim();
                 String secondToken = tokens.get(1).trim();
@@ -126,15 +142,10 @@ public final class FileParser {
             ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
         } catch (IOException ex) {
             ShowPrompt.fileParseError(file.getAbsolutePath(), 1);
-        } catch (ArrayIndexOutOfBoundsException ex) {
-            unrecFound++;
         }
 
         ShowPrompt.analysisReport(keyAndUrlFound, unrecFound);
     }
-
-    // TODO: rewrite get method here to reflect new change
-    // TODO: TEST!!!
 
     public static ObservableList<Key> get() {
         return keys;

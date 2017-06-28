@@ -33,7 +33,7 @@ public class Interface extends Application {
     // Core component: a ObservableList containing the actual data
     private static ObservableList<Key> keyList;
     // The File user chosen
-    private static File userTextFile;
+    private static File userTextFile = null;
     // Current language, default to system locale (EN if unsupported)
     private static Locale currentLocale = L10N.getDefaultLocale();
     // Default resource bundle
@@ -52,6 +52,21 @@ public class Interface extends Application {
             keyList = FileParser.parseAndGet(temp);
         } else {
             keyList = FileParser.getEmpty();
+        }
+    }
+
+    // Consider it prepareKeyList reversed
+    private static void saveKeyList(Stage stage) {
+        // Ask for save location only when creating a new collection
+        if (userTextFile == null) {
+            File dest = FileWriter.chooseFile(stage);
+            if (dest != null) {
+                userTextFile = dest;
+                FileWriter.saveToText(dest, keyList);
+            } // Do nothing otherwise
+        } else {
+            // Write to the opened text file
+            FileWriter.saveToText(userTextFile, keyList);
         }
     }
 
@@ -112,7 +127,7 @@ public class Interface extends Application {
         // -------- Save
 //        MenuItem saveItem = new MenuItem(lang.getString("string_menuBar_file_save"));
         MenuItem saveItem = L10N.menuItemForKey("string_menuBar_file_save");
-        // TODO : Implement save functionality
+        saveItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage));
         // -------- Exit
 //        MenuItem closeItem = new MenuItem(lang.getString("string_menuBar_file_exit"));
         MenuItem closeItem = L10N.menuItemForKey("string_menuBar_file_exit");
@@ -166,6 +181,7 @@ public class Interface extends Application {
 
         // Add columns to the table and associate them with ObservableList
 //        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
+        // TODO fix layout
         TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
         gameCol.setMinWidth(200);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
@@ -397,12 +413,12 @@ final class ShowPrompt {
         return (alert.showAndWait().get() == ButtonType.YES);
     }
 
-    // Alert user if SKM cannot detect a pattern
+    // Let user know the outcome
     static void analysisReport(int ok, int failed) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Analyze results");
         alert.setHeaderText("SKM has finished analyzing the file");
-        alert.setContentText(ok + " valid Steam keys / redemption url was found.\n" +
+        alert.setContentText(ok + " valid Steam keys / redemption URLs were found.\n" +
                 +failed + " lines were failed to parse.");
         alert.showAndWait();
     }

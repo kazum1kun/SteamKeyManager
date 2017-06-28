@@ -1,0 +1,76 @@
+import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import java.io.*;
+import java.nio.file.Files;
+
+/**
+ * Write the Table to a file
+ * Supports txt, xlsx (upcoming), mysql (upcoming), maybe more
+ * <p>
+ * Writer engine version 1, supports key format 1
+ *
+ * @author Xuanli Lin
+ * @version 0.0.6-alpha
+ */
+
+public class FileWriter {
+    private static final String VER1_HEADER = "SKM Data Format 1";
+
+    public static File chooseFile(Stage stage) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Please specify the location to save your collection");
+        fileChooser.setInitialDirectory(new File(
+                System.getProperty("user.home") + "/Desktop"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Text File", "*.txt"),
+                new FileChooser.ExtensionFilter("All Files", "*.*")
+        );
+
+        return fileChooser.showSaveDialog(stage);
+    }
+
+    // Save the collection to a text file
+    public static void saveToText(File destination, ObservableList<Key> keys) {
+        // EMPTY the content of the file, if it exists
+        // Ik it's stupid, but by far the most reliable one
+        if (Files.exists(destination.toPath())) {
+            try {
+                // PrintWriter truncates everything in the file upon opening
+                PrintWriter pw = new PrintWriter(destination);
+                pw.close();
+                // That's it!! No need to write empty string to the file.
+            } catch (FileNotFoundException ex) {
+                // Since we made sure the file already exists, it's impossible for this to happen.
+                // NOP
+            }
+        } else {
+            // Create the file if it does not exist
+            try {
+                Files.createFile(destination.toPath());
+            } catch (IOException ex) {
+                // TODO prompt here
+            }
+        }
+
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(destination), "utf-8"))) {
+            // Metainfo
+            writer.write(VER1_HEADER);
+            writer.write(System.getProperty("line.separator"));
+            // Keys
+            for (Key key : keys) {
+                writer.write(key.getGame() + ";" + key.getKey() + ";" + key.getNotes() + System.getProperty("line.separator"));
+            }
+            // TODO prompt for a successful save
+        } catch (UnsupportedEncodingException ex) {
+            // TODO new prompt for this
+        } catch (FileNotFoundException ex) {
+            // Impossible. DO nothing here.
+            // NOP
+        } catch (IOException ex) {
+            // TODO ... you know the drill
+        }
+    }
+}
