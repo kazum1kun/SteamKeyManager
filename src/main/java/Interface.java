@@ -18,7 +18,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * Main interface class of the Steam Key Manager
@@ -37,7 +36,7 @@ public class Interface extends Application {
     // Current language, default to system locale (EN if unsupported)
     private static Locale currentLocale = L10N.getDefaultLocale();
     // Default resource bundle
-    private static ResourceBundle lang = null;
+//    private static ResourceBundle lang = null;
 
     public static void main(String[] args) {
         launch(args);
@@ -72,24 +71,23 @@ public class Interface extends Application {
 
     private static void updateLocale(Stage stage, TextField... textFields) {
         // This would set locale for most areas
-        lang = ResourceBundle.getBundle("language.lang", currentLocale);
+//        lang = ResourceBundle.getBundle("language.lang", currentLocale);
         L10N.setLocale(currentLocale);
 
         // Some cannot be set (for now), update them manually
         // APP TITLE
-        stage.setTitle(lang.getString("string_mainUI_app_name"));
+        stage.setTitle(L10N.get("string_mainUI_appName"));
 
         // TextField prompts
-        textFields[0].setPromptText(lang.getString("string_mainUI_game"));
-        textFields[1].setPromptText(lang.getString("string_mainUI_key"));
-        textFields[2].setPromptText(lang.getString("string_mainUI_notes"));
-
+        textFields[0].setPromptText(L10N.get("string_mainUI_game"));
+        textFields[1].setPromptText(L10N.get("string_mainUI_key"));
+        textFields[2].setPromptText(L10N.get("string_mainUI_notes"));
     }
 
     @Override
     public void start(Stage primaryStage) {
         // Multi-Language support
-        lang = ResourceBundle.getBundle("language.lang", currentLocale);
+//        lang = ResourceBundle.getBundle("language.lang", currentLocale);
 
         // Populate an empty ObservableList on program start
         keyList = FileParser.getEmpty();
@@ -102,13 +100,13 @@ public class Interface extends Application {
         // Set up a new scene and set properties of the stage
         Scene scene = new Scene(new VBox());
         // TODO change locale of this manually
-        primaryStage.setTitle(lang.getString("string_mainUI_app_name"));
+        primaryStage.setTitle(L10N.get("string_mainUI_appName"));
         primaryStage.setWidth(600);
         primaryStage.setHeight(600);
 
         // And a label displaying the name of the app
 //        Label appNameLabel = new Label(lang.getString("string_mainUI_app_name"));
-        Label appNameLabel = L10N.labelForKey("string_mainUI_app_name");
+        Label appNameLabel = L10N.labelForKey("string_mainUI_appName");
         appNameLabel.setFont(new Font("Segoe UI", 20));
 
         // Make table editable
@@ -210,14 +208,14 @@ public class Interface extends Application {
         // TODO update those manually
 //        TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
-        gameField.setPromptText(lang.getString("string_mainUI_game"));
+        gameField.setPromptText(L10N.get("string_mainUI_game"));
 //        TextField keyField = new TextField();
         keyField.setMaxWidth(keyCol.getMaxWidth());
-        keyField.setPromptText(lang.getString("string_mainUI_key"));
+        keyField.setPromptText(L10N.get("string_mainUI_key"));
 
 //        TextField notesField = new TextField();
         notesField.setMaxWidth(notesCol.getPrefWidth());
-        notesField.setPromptText(lang.getString("string_mainUI_notes"));
+        notesField.setPromptText(L10N.get("string_mainUI_notes"));
 
         // ...and a button
 //        Button addButton = new Button(lang.getString("string_mainUI_add"));
@@ -371,20 +369,21 @@ public class Interface extends Application {
     }
 }
 
-// Todo rewrite this class with res bundle
+
 final class ShowPrompt {
+
     // Prompt for to file I/O errors
     static void fileReadError(String pathToFile, int context) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Fatal Error");
-        alert.setHeaderText("An fatal error has occurred");
+        alert.setTitle(L10N.get("string_alert_fileReadError_title"));
+        alert.setHeaderText(L10N.get("string_alert_fileReadError_header"));
         if (context == 1) {
-            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
-                    "Please make sure the file exists and SKM has permissions to access it.");
+            alert.setContentText(L10N.get("string_alert_fileReadError_content_1",
+                    L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
         }
         if (context == 2) {
-            alert.setContentText("Steam Key Manager was unable to access file \"" + pathToFile + "\". " +
-                    "Please make sure SKM has permissions to access it, and it is not in use by another program.");
+            alert.setContentText(L10N.get("string_alert_fileReadError_content_2",
+                    L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
         }
         alert.showAndWait();
     }
@@ -392,11 +391,11 @@ final class ShowPrompt {
     // Prompt for parsing errors
     static void fileParseError(String pathToFile, int context) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("File Parse Error");
-        alert.setHeaderText("An parsing error has occurred");
+        alert.setTitle(L10N.get("string_alert_fileParseError_title"));
+        alert.setHeaderText(L10N.get("string_alert_fileParseError_header"));
         if (context == 1) {
-            alert.setContentText("Steam Key Manager has recognized the format of the file, " +
-                    "but unable to parse the content. Make sure the file is not in use by another program.");
+            alert.setContentText(L10N.get("string_alert_fileParseError_content_1",
+                    L10N.get("string_mainUI_appName")));
         }
 
         alert.showAndWait();
@@ -405,21 +404,21 @@ final class ShowPrompt {
     // Prompt to ask whether user want to analyze the file
     static boolean oldFormat() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Unrecognized Format");
-        alert.setHeaderText("Old or unrecognized format");
-        alert.setContentText("Steam Key Manager was unable to recognize the format of the file. " +
-                "Do you want SKM to attempt to analyze the file?");
+        alert.setTitle(L10N.get("string_alert_oldFormat_title"));
+        alert.setHeaderText(L10N.get("string_alert_oldFormat_header"));
+        alert.setContentText(L10N.get("string_alert_oldFormat_content",
+                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort")));
         alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
         return (alert.showAndWait().get() == ButtonType.YES);
     }
 
-    // Let user know the outcome
+    // Let user know the parse results
     static void analysisReport(int ok, int failed) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Analyze results");
-        alert.setHeaderText("SKM has finished analyzing the file");
-        alert.setContentText(ok + " valid Steam keys / redemption URLs were found.\n" +
-                +failed + " lines were failed to parse.");
+        alert.setTitle(L10N.get("string_alert_analysisReport_title"));
+        alert.setHeaderText(L10N.get("string_alert_analysisReport_header",
+                L10N.get("string_mainUI_appNameShort")));
+        alert.setContentText(L10N.get("string_alert_analysisReport_content", ok, failed));
         alert.showAndWait();
     }
 }

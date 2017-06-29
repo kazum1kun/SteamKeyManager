@@ -198,4 +198,8 @@ public final class L10N {
         return textField;
     }
 
+    // Get current Resource Bundle
+    public static ResourceBundle getCurrentResBundle() {
+        return ResourceBundle.getBundle("language.lang", getLocale());
+    }
 }

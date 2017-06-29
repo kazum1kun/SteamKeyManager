@@ -1,3 +1,4 @@
+import Utils.L10N;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -20,12 +21,12 @@ public class FileWriter {
 
     public static File chooseFile(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Please specify the location to save your collection");
+        fileChooser.setTitle(L10N.get("string_fileChooser_save_title"));
         fileChooser.setInitialDirectory(new File(
                 System.getProperty("user.home") + "/Desktop"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text File", "*.txt"),
-                new FileChooser.ExtensionFilter("All Files", "*.*")
+                new FileChooser.ExtensionFilter(L10N.get("string_fileChooser_filter_txt"), "*.txt"),
+                new FileChooser.ExtensionFilter(L10N.get("string_fileChooser_filter_allFiles"), "*.*")
         );
 
         return fileChooser.showSaveDialog(stage);
