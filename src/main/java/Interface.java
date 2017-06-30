@@ -46,6 +46,12 @@ public class Interface extends Application {
     // blank key list
     private static void prepareKeyList(Stage stage) {
         File temp = FileParser.chooseFile(stage);
+        // Clear the content of keyList if a file is already loaded
+        if (!keyList.isEmpty()) {
+            // TODO alert user before this happens
+            keyList.clear();
+        }
+
         if (temp != null) {
             userTextFile = temp;
             keyList = FileParser.parseAndGet(temp);
@@ -178,26 +184,30 @@ public class Interface extends Application {
 
 
         // Add columns to the table and associate them with ObservableList
+        // COLUMN WIDTHS
 //        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
         // TODO fix layout
         TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
-        gameCol.setMinWidth(200);
+        gameCol.setMinWidth(150);
+        gameCol.setPrefWidth(200);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
 
 //        TableColumn keyCol = new TableColumn(lang.getString("string_mainUI_key"));
         TableColumn keyCol = L10N.tableColumnForKey("string_mainUI_key");
-        keyCol.setMinWidth(200);
+        keyCol.setMinWidth(135);
+        keyCol.setMaxWidth(135);
         keyCol.setCellValueFactory(new PropertyValueFactory<Key, String>("key"));
 
 //        TableColumn notesCol = new TableColumn(lang.getString("string_mainUI_notes"));
         TableColumn notesCol = L10N.tableColumnForKey("string_mainUI_notes");
-        notesCol.setMaxWidth(100);
+        notesCol.setMinWidth(100);
         notesCol.setCellValueFactory(new PropertyValueFactory<Key, String>("notes"));
 
         keyTable.setItems(keyList);
         keyTable.getColumns().addAll(gameCol, keyCol, notesCol);
         keyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-
+        // Make the table matches the height of the tableBox
+        keyTable.setPrefHeight(1000);
 
         // Implement cell editing
         gameCol.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -216,6 +226,11 @@ public class Interface extends Application {
 //        TextField notesField = new TextField();
         notesField.setMaxWidth(notesCol.getPrefWidth());
         notesField.setPromptText(L10N.get("string_mainUI_notes"));
+
+        // Set the widths of these TextFields
+        gameField.setPrefColumnCount(20);
+        keyField.setPrefColumnCount(17);
+        notesField.setPrefColumnCount(20);
 
         // ...and a button
 //        Button addButton = new Button(lang.getString("string_mainUI_add"));
@@ -258,16 +273,23 @@ public class Interface extends Application {
                 }
         );
 
-        // Set an lambda listener to button action
+        // Add the input to the list
         addButton.setOnAction(event -> {
-            // Create a new Key and add it to keyList
-            Key key = new Key(
-                    gameField.getText(),
-                    keyField.getText(),
-                    notesField.getText()
-            );
-            keyList.add(key);
+            // Add the key only if at least game and key is present
+            if (!gameField.getText().isEmpty() && !keyField.getText().isEmpty()) {
+                // Create a new Key and add it to keyList
+                Key key = new Key(
+                        gameField.getText(),
+                        keyField.getText(),
+                        notesField.getText()
+                );
+                keyList.add(key);
 
+                // Clear input fields
+                gameField.clear();
+                keyField.clear();
+                notesField.clear();
+            }
             // Database Test
 //            try {
 //                KeyDao mysql = new KeyDao(Utils.DBTool.MYSQL);
@@ -289,11 +311,6 @@ public class Interface extends Application {
 //            } catch (SQLException e) {
 //                e.printStackTrace();
 //            }
-
-            // Clear input fields
-            gameField.clear();
-            keyField.clear();
-            notesField.clear();
         });
 
         // Context menu for rows
@@ -350,15 +367,15 @@ public class Interface extends Application {
         // A Hbox to hold the add section and the menu bar
         HBox addBox = new HBox();
 
+        // Set properties and add components to HBox
+        addBox.setSpacing(5);
+        addBox.getChildren().addAll(gameField, keyField, notesField, addButton);
 
         // Set properties and add components to VBox
+        // TABLE INSECTS WITH THE BOUNDARY
         tableBox.setSpacing(5);
-        tableBox.setPadding(new Insets(10, 0, 0, 10));
+        tableBox.setPadding(new Insets(10, 10, 10, 10));
         tableBox.getChildren().addAll(appNameLabel, keyTable, addBox);
-
-        // Set properties and add components to HBox
-        addBox.setSpacing(3);
-        addBox.getChildren().addAll(gameField, keyField, notesField, addButton);
 
         // Add VBox to scene
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, tableBox);

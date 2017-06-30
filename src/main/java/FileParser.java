@@ -146,6 +146,8 @@ public final class FileParser {
         }
 
         ShowPrompt.analysisReport(keyAndUrlFound, unrecFound);
+        // Reset the counter once the process is finished
+        keyAndUrlFound = unrecFound = 0;
     }
 
     public static ObservableList<Key> get() {
