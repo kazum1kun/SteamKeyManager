@@ -13,7 +13,7 @@ import java.nio.file.Files;
  * Writer engine version 1, supports key format 1
  *
  * @author Xuanli Lin
- * @version 0.0.6-alpha
+ * @version 0.1.0-alpha
  */
 
 public class FileWriter {
@@ -51,7 +51,7 @@ public class FileWriter {
             try {
                 Files.createFile(destination.toPath());
             } catch (IOException ex) {
-                // TODO prompt here
+                ShowPrompt.fileCreateError(destination.getPath());
             }
         }
 
@@ -64,14 +64,12 @@ public class FileWriter {
             for (Key key : keys) {
                 writer.write(key.getGame() + ";" + key.getKey() + ";" + key.getNotes() + System.getProperty("line.separator"));
             }
-            // TODO prompt for a successful save
-        } catch (UnsupportedEncodingException ex) {
-            // TODO new prompt for this
-        } catch (FileNotFoundException ex) {
-            // Impossible. DO nothing here.
+            ShowPrompt.fileSaved(destination.getPath());
+        } catch (UnsupportedEncodingException | FileNotFoundException ex) {
+            // Impossible. Do nothing here
             // NOP
         } catch (IOException ex) {
-            // TODO ... you know the drill
+            ShowPrompt.fileSaveError(destination.getPath());
         }
     }
 }

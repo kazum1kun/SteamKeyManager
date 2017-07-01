@@ -58,9 +58,9 @@ public final class FileParser {
                 }
             }
         } catch (FileNotFoundException ex) {
-            ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
+            ShowPrompt.fileReadError(file.getPath(), 1);
         } catch (IOException ex) {
-            ShowPrompt.fileReadError(file.getAbsolutePath(), 2);
+            ShowPrompt.fileReadError(file.getPath(), 2);
         }
     }
 
@@ -86,9 +86,9 @@ public final class FileParser {
                 }
             }
         } catch (FileNotFoundException ex) {
-            ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
+            ShowPrompt.fileReadError(file.getPath(), 1);
         } catch (IOException ex) {
-            ShowPrompt.fileParseError(file.getAbsolutePath(), 1);
+            ShowPrompt.fileParseError(file.getPath(), 1);
         }
     }
 
@@ -140,9 +140,9 @@ public final class FileParser {
                 keys.add(new Key(gameToken, keyToken, ""));
             }
         } catch (FileNotFoundException ex) {
-            ShowPrompt.fileReadError(file.getAbsolutePath(), 1);
+            ShowPrompt.fileReadError(file.getPath(), 1);
         } catch (IOException ex) {
-            ShowPrompt.fileParseError(file.getAbsolutePath(), 1);
+            ShowPrompt.fileParseError(file.getPath(), 1);
         }
 
         ShowPrompt.analysisReport(keyAndUrlFound, unrecFound);

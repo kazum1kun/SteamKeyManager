@@ -18,12 +18,13 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * Main interface class of the Steam Key Manager
  *
  * @author Xuanli Lin
- * @version 0.0.5-1-alpha
+ * @version 0.1.0-alpha
  */
 public class Interface extends Application {
 
@@ -48,8 +49,9 @@ public class Interface extends Application {
         File temp = FileParser.chooseFile(stage);
         // Clear the content of keyList if a file is already loaded
         if (!keyList.isEmpty()) {
-            // TODO alert user before this happens
-            keyList.clear();
+            if (ShowPrompt.confirmLoad(stage)) {
+                keyList.clear();
+            }
         }
 
         if (temp != null) {
@@ -61,7 +63,7 @@ public class Interface extends Application {
     }
 
     // Consider it prepareKeyList reversed
-    private static void saveKeyList(Stage stage) {
+    static void saveKeyList(Stage stage) {
         // Ask for save location only when creating a new collection
         if (userTextFile == null) {
             File dest = FileWriter.chooseFile(stage);
@@ -135,7 +137,10 @@ public class Interface extends Application {
         // -------- Exit
 //        MenuItem closeItem = new MenuItem(lang.getString("string_menuBar_file_exit"));
         MenuItem closeItem = L10N.menuItemForKey("string_menuBar_file_exit");
-        // TODO: prompt user to confirm exit
+        closeItem.setOnAction((ActionEvent event) -> {
+            if (ShowPrompt.confirmQuit())
+                primaryStage.close();
+        });
         // Assemble the File Menu
         fileMenu.getItems().addAll(openItem, saveItem, closeItem);
 
@@ -186,7 +191,6 @@ public class Interface extends Application {
         // Add columns to the table and associate them with ObservableList
         // COLUMN WIDTHS
 //        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
-        // TODO fix layout
         TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
         gameCol.setMinWidth(150);
         gameCol.setPrefWidth(200);
@@ -437,5 +441,65 @@ final class ShowPrompt {
                 L10N.get("string_mainUI_appNameShort")));
         alert.setContentText(L10N.get("string_alert_analysisReport_content", ok, failed));
         alert.showAndWait();
+    }
+
+    // Prompt for file creation errors
+    static void fileCreateError(String pathToFile) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(L10N.get("string_alert_fileCreateError_title"));
+        alert.setHeaderText(L10N.get("string_alert_fileCreateError_header"));
+        alert.setContentText(L10N.get("string_alert_fileCreateError_content",
+                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
+
+        alert.showAndWait();
+    }
+
+    // Prompt for a successful save
+    static void fileSaved(String pathToFile) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(L10N.get("string_alert_fileSaved_title"));
+        alert.setContentText(L10N.get("string_alert_fileSaved_content",
+                L10N.get("string_mainUI_appName"), pathToFile));
+
+        alert.showAndWait();
+    }
+
+    // Prompt for file save errors
+    static void fileSaveError(String pathToFile) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(L10N.get("string_alert_fileSaveError_title"));
+        alert.setHeaderText(L10N.get("string_alert_fileSaveError_header",
+                L10N.get("string_mainUI_appNameShort")));
+        alert.setContentText(L10N.get("string_alert_fileSaveError_content",
+                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
+
+        alert.showAndWait();
+    }
+
+    // Ask user whether they want to purge the list and load a new file
+    static boolean confirmLoad(Stage stage) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(L10N.get("string_alert_confirmLoad_title"));
+        alert.setHeaderText(L10N.get("string_alert_confirmLoad_header"));
+        alert.setContentText(L10N.get("string_alert_confirmLoad_content"));
+        ButtonType saveThenLoad = new ButtonType(L10N.get("string_alert_confirmLoad_button"), ButtonBar.ButtonData.YES);
+
+        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, saveThenLoad);
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.get() == saveThenLoad) {
+            Interface.saveKeyList(stage);
+        }
+
+        return (result.get() == ButtonType.YES);
+    }
+
+    static boolean confirmQuit() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(L10N.get("string_alert_confirmQuit_title"));
+        alert.setHeaderText(L10N.get("string_alert_confirmQuit_header"));
+        alert.setContentText(L10N.get("string_alert_confirmQuit_content"));
+
+        return (alert.showAndWait().get() == ButtonType.OK);
     }
 }
