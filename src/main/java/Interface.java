@@ -107,7 +107,7 @@ public class Interface extends Application {
 
         // Set up a new scene and set properties of the stage
         Scene scene = new Scene(new VBox());
-        // TODO change locale of this manually
+        // change locale of this manually
         primaryStage.setTitle(L10N.get("string_mainUI_appName"));
         primaryStage.setWidth(600);
         primaryStage.setHeight(600);
@@ -219,7 +219,7 @@ public class Interface extends Application {
         notesCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         // Add textFields to add a new key. Make them no wider than the table
-        // TODO update those manually
+        // update those manually
 //        TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
         gameField.setPromptText(L10N.get("string_mainUI_game"));

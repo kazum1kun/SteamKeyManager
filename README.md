@@ -1,6 +1,8 @@
 # Steam Key Manager
 Simple JavaFX based GUI tool that helps organizing your Steam keys and redemption URLs (WIP)
 
+Latest version: 0.1.0-alpha
+
 ## Intro & Motivation
 Hi all! Originally this GUI based tool was made for my own use only, but now I decided to publish it to Github as my "early Java projects". Nothing quite special, just a handy tool to deal with my ever-increasing pool of unused Steam keys.
 
@@ -9,11 +11,8 @@ If you are kind of person like me, this tool might come in handy for you, too.
 Though various improvements was made to this project, I still consider this WIP and some features are to be added when I'm free
 
 ## How to Use
-Since the executable is not quite ready yet, you have to download the source code and compile it yourself. 
-
-You will see a file picker on SKM start. Pick an existing text file if you want to import, or hit Cancel if you want to
-start a new collection. If you selected a file, SKM will automatically detect SKM archives and import the keys in it. 
-If SKM cannot recognize the file, you can ask it to attempt parse the file and import the keys for you.
+Download & run the latest executable from the [Releases] tab. You need Java RE installed on your computer. You can 
+download a free copy [here]
 
 Currently the file parser is very immature and can only recognize a very specific pattern of data:
 
@@ -29,11 +28,11 @@ As of now, the Steam Key Manager supports:
 - Edit an entry
 - Copy key to the system clipboard
 - Import keys from an existing text file
+- Save the table to a text file
 - Intuitive, minimal and modern UI design
 
 Here's a list of planned updates to the manager (priority ones marked in **bold**):
-- **Search** (coming in 0.1.0)
-- **Write to files**
+- **Search** (being looked at)
 - Improved file parser (for Non-SKM formats)
 - Remark entries (e.g. important, for trade, redeemed)
 - Support for more formats
@@ -46,13 +45,26 @@ Here's a list of planned updates to the manager (priority ones marked in **bold*
 Should you encounter bugs and other issues, feel free to post them in the [Issues] tab.
 I know for sure that my codes are still not perfect. Feel free to commend upon the codes.
 
-Due to its immature nature I will not release a Java executable version of the manager for now.
-
 ## Changelog
+### Version 0.1.0-alpha
+**"The internationalization update"**, released Jul 4, 2017
+
+Happy independence day!!
+
+After days of coding and testing I am glad to announce this major feature update to SKM. 
+This update in fact included more features than original 0.1.0. Enjoy!
+
+- +(major) Added localization for Simp Chinese and Japanese
+- +(major) Implemented functionality to write to files. Now the read/write should be fully functional
+- +(minor) Added more dialogs to make SKM more responsive
+- ~(minor) Tweaked the layout of the key table and other areas
+- ~(minor) QoL changes and bug fixes
+
+
 ### Version 0.0.5-1-alpha
 Released on Jun 26, 2017
-- (minor) Added "Copy Key" and "Copy Key and Remove" to the context menu
-- (minor) Tweaked changelog format
+- +(minor) Added "Copy Key" and "Copy Key and Remove" to the context menu
+- ~(minor) Tweaked changelog format
 
 ### Version 0.0.5-alpha
 Released on Jun 25, 2017
@@ -99,3 +111,5 @@ Released on Feb 23, 2017
 - Support addition of keys only
 
 [Issues]: <https://github.com/l19980623/SteamKeyManager/issues>
+[Releases]: <https://github.com/l19980623/SteamKeyManager/releases>
+[here]: <https://java.com/download>
