@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
  */
 
 public final class FileParser {
-    private static final String VER1_HEADER = "\uFEFFSKM Data Format 1";
+    private static final String VER1_HEADER = "SKM Data Format 1";
     private static ObservableList<Key> keys = FXCollections.observableArrayList();
     private static int keyAndUrlFound = 0, unrecFound = 0;
 

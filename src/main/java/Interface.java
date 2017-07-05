@@ -63,9 +63,17 @@ public class Interface extends Application {
     }
 
     // Consider it prepareKeyList reversed
-    static void saveKeyList(Stage stage) {
+    // MODE: 0 = do not nullity of check userTextFile, effectively Save As...
+    //       1 = check for userTextFile existence, and overwrite uTF without user acknowledge
+    static void saveKeyList(Stage stage, int mode) {
         // Ask for save location only when creating a new collection
-        if (userTextFile == null) {
+        if (mode == 1 && userTextFile == null) {
+            File dest = FileWriter.chooseFile(stage);
+            if (dest != null) {
+                userTextFile = dest;
+                FileWriter.saveToText(dest, keyList);
+            } // Do nothing otherwise
+        } else if (mode == 0) {
             File dest = FileWriter.chooseFile(stage);
             if (dest != null) {
                 userTextFile = dest;
@@ -133,7 +141,10 @@ public class Interface extends Application {
         // -------- Save
 //        MenuItem saveItem = new MenuItem(lang.getString("string_menuBar_file_save"));
         MenuItem saveItem = L10N.menuItemForKey("string_menuBar_file_save");
-        saveItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage));
+        saveItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage, 1));
+        // -------- Save as
+        MenuItem saveAsItem = L10N.menuItemForKey("string_menuBar_file_saveAs");
+        saveAsItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage, 0));
         // -------- Exit
 //        MenuItem closeItem = new MenuItem(lang.getString("string_menuBar_file_exit"));
         MenuItem closeItem = L10N.menuItemForKey("string_menuBar_file_exit");
@@ -142,7 +153,7 @@ public class Interface extends Application {
                 primaryStage.close();
         });
         // Assemble the File Menu
-        fileMenu.getItems().addAll(openItem, saveItem, closeItem);
+        fileMenu.getItems().addAll(openItem, saveItem, saveAsItem, closeItem);
 
         // ---- Edit
 //        Menu editMenu = new Menu(lang.getString("string_menuBar_edit"));
@@ -193,7 +204,7 @@ public class Interface extends Application {
 //        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
         TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
         gameCol.setMinWidth(150);
-        gameCol.setPrefWidth(200);
+        gameCol.setPrefWidth(180);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
 
 //        TableColumn keyCol = new TableColumn(lang.getString("string_mainUI_key"));
@@ -458,6 +469,7 @@ final class ShowPrompt {
     static void fileSaved(String pathToFile) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(L10N.get("string_alert_fileSaved_title"));
+        alert.setHeaderText(null);
         alert.setContentText(L10N.get("string_alert_fileSaved_content",
                 L10N.get("string_mainUI_appName"), pathToFile));
 
@@ -488,7 +500,7 @@ final class ShowPrompt {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == saveThenLoad) {
-            Interface.saveKeyList(stage);
+            Interface.saveKeyList(stage, 1);
         }
 
         return (result.get() == ButtonType.YES);
