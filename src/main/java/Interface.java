@@ -2,6 +2,7 @@ import Utils.L10N;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -127,6 +128,9 @@ public class Interface extends Application {
 
         // Make table editable
         keyTable.setEditable(true);
+
+        // Search function implementation with FilteredList
+        FilteredList<Key> filteredKeyList = new FilteredList<>(keyList, p -> true);
 
         // MenuBar is here!
         MenuBar menuBar = new MenuBar();
