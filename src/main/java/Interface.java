@@ -3,6 +3,7 @@ import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -25,7 +26,7 @@ import java.util.Optional;
  * Main interface class of the Steam Key Manager
  *
  * @author Xuanli Lin
- * @version 0.1.0-alpha
+ * @version 0.2.0-alpha
  */
 public class Interface extends Application {
 
@@ -99,6 +100,7 @@ public class Interface extends Application {
         textFields[0].setPromptText(L10N.get("string_mainUI_game"));
         textFields[1].setPromptText(L10N.get("string_mainUI_key"));
         textFields[2].setPromptText(L10N.get("string_mainUI_notes"));
+        textFields[3].setPromptText(L10N.get("string_mainUI_search"));
     }
 
     @Override
@@ -130,7 +132,40 @@ public class Interface extends Application {
         keyTable.setEditable(true);
 
         // Search function implementation with FilteredList
+        // Adopted from the tutorial at http://code.makery.ch/blog/javafx-8-tableview-sorting-filtering/
         FilteredList<Key> filteredKeyList = new FilteredList<>(keyList, p -> true);
+
+        // Enter query here!
+        TextField searchField = new TextField();
+        searchField.setPromptText(L10N.get("string_mainUI_search"));
+        searchField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredKeyList.setPredicate(key -> {
+                // Display all keys if search field is empty
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                // Compare search query with game names and notes
+                String lowerCaseQuery = newValue.toLowerCase();
+                // Query matches a game
+                if (key.getGame().toLowerCase().contains(lowerCaseQuery))
+                    return true;
+                    // Query matches a notes
+                else if (key.getNotes().toLowerCase().contains(lowerCaseQuery))
+                    return true;
+                // Query matches nothing
+                return false;
+            });
+        }));
+
+        // Wrap the FilteredList in a SortedList.
+        SortedList<Key> sortedKeyList = new SortedList<>(filteredKeyList);
+
+        // Bind the SortedList comparator to the TableView comparator.
+        sortedKeyList.comparatorProperty().bind(keyTable.comparatorProperty());
+
+        // Add sorted (and filtered) data to the table.
+        keyTable.setItems(sortedKeyList);
 
         // MenuBar is here!
         MenuBar menuBar = new MenuBar();
@@ -181,8 +216,18 @@ public class Interface extends Application {
         RadioMenuItem japaneseItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_ja");
         japaneseItem.setUserData(Locale.JAPANESE);
         japaneseItem.setToggleGroup(langGroup);
-        // Default to English
-        englishItem.setSelected(true);
+        // Default to system locale (English if not supported)
+        switch (currentLocale.toString()) {
+            case "en_US":
+                englishItem.setSelected(true);
+                break;
+            case "zh_CN":
+                simpChineseItem.setSelected(true);
+                break;
+            case "ja_JP":
+                japaneseItem.setSelected(true);
+                break;
+        }
         // Assemble the Language menu
         langMenu.getItems().addAll(englishItem, simpChineseItem, japaneseItem);
         // Assemble Edit menu
@@ -195,7 +240,7 @@ public class Interface extends Application {
             } catch (NullPointerException ex) {
                 System.out.println("Some weird problem happened while switching language. Not a big deal though.");
             }
-            updateLocale(primaryStage, gameField, keyField, notesField);
+            updateLocale(primaryStage, gameField, keyField, notesField, searchField);
         });
 
 
@@ -222,7 +267,6 @@ public class Interface extends Application {
         notesCol.setMinWidth(100);
         notesCol.setCellValueFactory(new PropertyValueFactory<Key, String>("notes"));
 
-        keyTable.setItems(keyList);
         keyTable.getColumns().addAll(gameCol, keyCol, notesCol);
         keyTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         // Make the table matches the height of the tableBox
@@ -234,7 +278,6 @@ public class Interface extends Application {
         notesCol.setCellFactory(TextFieldTableCell.forTableColumn());
 
         // Add textFields to add a new key. Make them no wider than the table
-        // update those manually
 //        TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
         gameField.setPromptText(L10N.get("string_mainUI_game"));
@@ -343,8 +386,16 @@ public class Interface extends Application {
             final MenuItem copyKey = L10N.menuItemForKey("string_contextMenu_copy");
             final MenuItem copyKeyAndRemove = L10N.menuItemForKey("string_contextMenu_copyAndRemove");
 
+
             // Listener for removing a row
-            removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
+//            removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
+            // Method updated to reflect changes on the VC model
+            removeRow.setOnAction((ActionEvent event) -> {
+                Key selectedKey = keyTable.getSelectionModel().getSelectedItem();
+                if (selectedKey != null) {
+                    keyList.remove(selectedKey);
+                }
+            });
 
             // Listener for copying a key
             copyKey.setOnAction((ActionEvent event) -> {
@@ -366,7 +417,13 @@ public class Interface extends Application {
                 String key = keyTable.getItems().get(selectedRow).getKey();
                 content.putString(key);
                 clipboard.setContent(content);
-                keyTable.getItems().remove(row.getItem());
+
+                // Updated
+                Key selectedKey = keyTable.getSelectionModel().getSelectedItem();
+                if (selectedKey != null) {
+                    keyList.remove(selectedKey);
+                }
+//                keyTable.getItems().remove(row.getItem());
             });
 
             // Assemble the menu
@@ -394,10 +451,13 @@ public class Interface extends Application {
         // TABLE INSECTS WITH THE BOUNDARY
         tableBox.setSpacing(5);
         tableBox.setPadding(new Insets(10, 10, 10, 10));
-        tableBox.getChildren().addAll(appNameLabel, keyTable, addBox);
+        tableBox.getChildren().addAll(appNameLabel, searchField, keyTable, addBox);
 
         // Add VBox to scene
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, tableBox);
+
+        // Make sure key table is focused on app start
+        keyTable.requestFocus();
 
         // Finalize the settings
         primaryStage.setScene(scene);
