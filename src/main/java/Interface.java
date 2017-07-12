@@ -10,7 +10,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.HBox;
@@ -20,7 +19,6 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * Main interface class of the Steam Key Manager
@@ -65,7 +63,7 @@ public class Interface extends Application {
     }
 
     // Consider it prepareKeyList reversed
-    // MODE: 0 = do not nullity of check userTextFile, effectively Save As...
+    // MODE: 0 = do not check nullity of userTextFile, effectively Save As...
     //       1 = check for userTextFile existence, and overwrite uTF without user acknowledge
     static void saveKeyList(Stage stage, int mode) {
         // Ask for save location only when creating a new collection
@@ -138,6 +136,19 @@ public class Interface extends Application {
         // Enter query here!
         TextField searchField = new TextField();
         searchField.setPromptText(L10N.get("string_mainUI_search"));
+        searchField.setPrefWidth(primaryStage.getWidth() / 2);
+        // Button to clear search query
+        Button clearSeachButton = L10N.buttonForKey("string_mainUI_clear");
+        clearSeachButton.setOnAction((ActionEvent event) -> {
+            if (!searchField.getText().isEmpty())
+                searchField.clear();
+        });
+
+        // Bundle searchField and 'clear' button together
+        HBox searchBox = new HBox(searchField, clearSeachButton);
+        searchBox.setSpacing(5);
+
+
         searchField.textProperty().addListener(((observable, oldValue, newValue) -> {
             filteredKeyList.setPredicate(key -> {
                 // Display all keys if search field is empty
@@ -273,9 +284,10 @@ public class Interface extends Application {
         keyTable.setPrefHeight(1000);
 
         // Implement cell editing
-        gameCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        keyCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        notesCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        //gameCol.setCellFactory(TextFieldTableCell.forTableColumn());      -> Old implementation
+        gameCol.setCellFactory(column -> EditCell.createStringEditCell());
+        keyCol.setCellFactory(column -> EditCell.createStringEditCell());
+        notesCol.setCellFactory(column -> EditCell.createStringEditCell());
 
         // Add textFields to add a new key. Make them no wider than the table
 //        TextField gameField = new TextField();
@@ -298,7 +310,7 @@ public class Interface extends Application {
 //        Button addButton = new Button(lang.getString("string_mainUI_add"));
         Button addButton = L10N.buttonForKey("string_mainUI_add");
 
-        // Set listeners for column cells
+        // Change content of table on commit
         gameCol.setOnEditCommit(
                 new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
                     @Override
@@ -426,6 +438,15 @@ public class Interface extends Application {
 //                keyTable.getItems().remove(row.getItem());
             });
 
+            // Commit change on focus lost
+            keyTable.setOnKeyPressed(event -> {
+                TablePosition<Key, ?> pos = keyTable.getFocusModel().getFocusedCell();
+                if (pos != null && event.getCode().isLetterKey()) {
+                    keyTable.edit(pos.getRow(), pos.getTableColumn());
+                }
+            });
+
+
             // Assemble the menu
             cm.getItems().addAll(removeRow, copyKey, copyKeyAndRemove);
 
@@ -451,7 +472,7 @@ public class Interface extends Application {
         // TABLE INSECTS WITH THE BOUNDARY
         tableBox.setSpacing(5);
         tableBox.setPadding(new Insets(10, 10, 10, 10));
-        tableBox.getChildren().addAll(appNameLabel, searchField, keyTable, addBox);
+        tableBox.getChildren().addAll(appNameLabel, searchBox, keyTable, addBox);
 
         // Add VBox to scene
         ((VBox) scene.getRoot()).getChildren().addAll(menuBar, tableBox);
@@ -462,120 +483,5 @@ public class Interface extends Application {
         // Finalize the settings
         primaryStage.setScene(scene);
         primaryStage.show();
-    }
-}
-
-
-final class ShowPrompt {
-
-    // Prompt for to file I/O errors
-    static void fileReadError(String pathToFile, int context) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(L10N.get("string_alert_fileReadError_title"));
-        alert.setHeaderText(L10N.get("string_alert_fileReadError_header"));
-        if (context == 1) {
-            alert.setContentText(L10N.get("string_alert_fileReadError_content_1",
-                    L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
-        }
-        if (context == 2) {
-            alert.setContentText(L10N.get("string_alert_fileReadError_content_2",
-                    L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
-        }
-        alert.showAndWait();
-    }
-
-    // Prompt for parsing errors
-    static void fileParseError(String pathToFile, int context) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(L10N.get("string_alert_fileParseError_title"));
-        alert.setHeaderText(L10N.get("string_alert_fileParseError_header"));
-        if (context == 1) {
-            alert.setContentText(L10N.get("string_alert_fileParseError_content_1",
-                    L10N.get("string_mainUI_appName")));
-        }
-
-        alert.showAndWait();
-    }
-
-    // Prompt to ask whether user want to analyze the file
-    static boolean oldFormat() {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(L10N.get("string_alert_oldFormat_title"));
-        alert.setHeaderText(L10N.get("string_alert_oldFormat_header"));
-        alert.setContentText(L10N.get("string_alert_oldFormat_content",
-                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort")));
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO);
-        return (alert.showAndWait().get() == ButtonType.YES);
-    }
-
-    // Let user know the parse results
-    static void analysisReport(int ok, int failed) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(L10N.get("string_alert_analysisReport_title"));
-        alert.setHeaderText(L10N.get("string_alert_analysisReport_header",
-                L10N.get("string_mainUI_appNameShort")));
-        alert.setContentText(L10N.get("string_alert_analysisReport_content", ok, failed));
-        alert.showAndWait();
-    }
-
-    // Prompt for file creation errors
-    static void fileCreateError(String pathToFile) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(L10N.get("string_alert_fileCreateError_title"));
-        alert.setHeaderText(L10N.get("string_alert_fileCreateError_header"));
-        alert.setContentText(L10N.get("string_alert_fileCreateError_content",
-                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
-
-        alert.showAndWait();
-    }
-
-    // Prompt for a successful save
-    static void fileSaved(String pathToFile) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(L10N.get("string_alert_fileSaved_title"));
-        alert.setHeaderText(null);
-        alert.setContentText(L10N.get("string_alert_fileSaved_content",
-                L10N.get("string_mainUI_appName"), pathToFile));
-
-        alert.showAndWait();
-    }
-
-    // Prompt for file save errors
-    static void fileSaveError(String pathToFile) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(L10N.get("string_alert_fileSaveError_title"));
-        alert.setHeaderText(L10N.get("string_alert_fileSaveError_header",
-                L10N.get("string_mainUI_appNameShort")));
-        alert.setContentText(L10N.get("string_alert_fileSaveError_content",
-                L10N.get("string_mainUI_appName"), L10N.get("string_mainUI_appNameShort"), pathToFile));
-
-        alert.showAndWait();
-    }
-
-    // Ask user whether they want to purge the list and load a new file
-    static boolean confirmLoad(Stage stage) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(L10N.get("string_alert_confirmLoad_title"));
-        alert.setHeaderText(L10N.get("string_alert_confirmLoad_header"));
-        alert.setContentText(L10N.get("string_alert_confirmLoad_content"));
-        ButtonType saveThenLoad = new ButtonType(L10N.get("string_alert_confirmLoad_button"), ButtonBar.ButtonData.YES);
-
-        alert.getButtonTypes().setAll(ButtonType.YES, ButtonType.NO, saveThenLoad);
-        Optional<ButtonType> result = alert.showAndWait();
-
-        if (result.get() == saveThenLoad) {
-            Interface.saveKeyList(stage, 1);
-        }
-
-        return (result.get() == ButtonType.YES);
-    }
-
-    static boolean confirmQuit() {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(L10N.get("string_alert_confirmQuit_title"));
-        alert.setHeaderText(L10N.get("string_alert_confirmQuit_header"));
-        alert.setContentText(L10N.get("string_alert_confirmQuit_content"));
-
-        return (alert.showAndWait().get() == ButtonType.OK);
     }
 }
