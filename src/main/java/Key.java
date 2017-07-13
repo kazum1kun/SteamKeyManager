@@ -1,5 +1,6 @@
 import javafx.beans.property.SimpleStringProperty;
 
+
 /**
  * Class representing individual entries
  * Key format version 1

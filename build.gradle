@@ -1,5 +1,5 @@
 group 'com.linstreasure'
-version '0.0.5-1-alpha'
+version '0.2.0-alpha'
 
 apply plugin: 'java'
 
@@ -15,6 +15,11 @@ dependencies {
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
     compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.19.3'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17-beta1'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+
 }
 
 jar {

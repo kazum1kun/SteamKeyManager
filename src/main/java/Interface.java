@@ -16,6 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.util.Locale;
@@ -33,7 +34,7 @@ public class Interface extends Application {
     // Core component: a ObservableList containing the actual data
     private static ObservableList<Key> keyList;
     // The File user chosen
-    private static File userTextFile = null;
+    private static File userFile = null;
     // Current language, default to system locale (EN if unsupported)
     private static Locale currentLocale = L10N.getDefaultLocale();
     // Default resource bundle
@@ -55,7 +56,7 @@ public class Interface extends Application {
         }
 
         if (temp != null) {
-            userTextFile = temp;
+            userFile = temp;
             keyList = FileParser.parseAndGet(temp);
         } else {
             keyList = FileParser.getEmpty();
@@ -63,25 +64,34 @@ public class Interface extends Application {
     }
 
     // Consider it prepareKeyList reversed
-    // MODE: 0 = do not check nullity of userTextFile, effectively Save As...
-    //       1 = check for userTextFile existence, and overwrite uTF without user acknowledge
+    // MODE: 0 = do not check nullity of userFile, effectively Save As...
+    //       1 = check for userFile existence, and overwrite uTF without user acknowledge
     static void saveKeyList(Stage stage, int mode) {
+        File dest;
         // Ask for save location only when creating a new collection
-        if (mode == 1 && userTextFile == null) {
-            File dest = FileWriter.chooseFile(stage);
+        if (mode == 1 && userFile == null || mode == 0) {
+            dest = FileWriter.chooseFile(stage);
             if (dest != null) {
-                userTextFile = dest;
-                FileWriter.saveToText(dest, keyList);
-            } // Do nothing otherwise
-        } else if (mode == 0) {
-            File dest = FileWriter.chooseFile(stage);
-            if (dest != null) {
-                userTextFile = dest;
-                FileWriter.saveToText(dest, keyList);
-            } // Do nothing otherwise
+                userFile = dest;
+            }
         } else {
-            // Write to the opened text file
-            FileWriter.saveToText(userTextFile, keyList);
+            dest = userFile;
+        }
+
+        // Detect the extension of the file and call appropriate file writers
+        switch (FilenameUtils.getExtension(userFile.getPath())) {
+            case "txt": // Plain text file
+                FileWriter.saveToText(dest, keyList);
+                break;
+            case "xlsx": // MS Excel file
+                ExcelOp.saveToExcel(dest, keyList);
+                break;
+            case "db":   // mySQL database
+                // Reserved
+                break;
+            default:    // Default to text file
+                FileWriter.saveToText(dest, keyList);
+                break;
         }
     }
 
