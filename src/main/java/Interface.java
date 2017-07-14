@@ -33,6 +33,10 @@ public class Interface extends Application {
     private static TableView<Key> keyTable = new TableView<>();
     // Core component: a ObservableList containing the actual data
     private static ObservableList<Key> keyList;
+    // Filtered keyList based on the keyList
+    private static FilteredList<Key> filteredKeyList;
+    // Sorted list that wraps filtered list
+    private static SortedList<Key> sortedKeyList;
     // The File user chosen
     private static File userFile = null;
     // Current language, default to system locale (EN if unsupported)
@@ -44,10 +48,9 @@ public class Interface extends Application {
         launch(args);
     }
 
-    // Prompt user to pick a file before SKM starts. Parse the file if possible. If no file is chosen, start SKM with
-    // blank key list
+    // Prompt user to choose a file and attempt to parse it
     private static void prepareKeyList(Stage stage) {
-        File temp = FileParser.chooseFile(stage);
+        File selectedFile = FileParser.chooseFile(stage);
         // Clear the content of keyList if a file is already loaded
         if (!keyList.isEmpty()) {
             if (ShowPrompt.confirmLoad(stage)) {
@@ -55,12 +58,36 @@ public class Interface extends Application {
             }
         }
 
-        if (temp != null) {
-            userFile = temp;
-            keyList = FileParser.parseAndGet(temp);
+        if (selectedFile != null) {
+            userFile = selectedFile;
+            switch (FilenameUtils.getExtension(selectedFile.getPath())) {
+                case "txt":     // Plain text file
+                    keyList = FileParser.parseAndGet(selectedFile);
+                    break;
+                case "xlsx":     // MS Excel file
+                    keyList = ExcelOp.parseExcelAndGet(selectedFile);
+                    break;
+                case "db":      // Reserved for mySQL db
+                    // Do something
+                    break;
+                default:        // Default to plain text file
+                    keyList = FileParser.parseAndGet(selectedFile);
+            }
         } else {
             keyList = FileParser.getEmpty();
         }
+
+        // Load the key list after all
+        filteredKeyList = new FilteredList<>(keyList, p -> true);
+
+        // Wrap the FilteredList in a SortedList.
+        sortedKeyList = new SortedList<>(filteredKeyList);
+
+        // Bind the SortedList comparator to the TableView comparator.
+        sortedKeyList.comparatorProperty().bind(keyTable.comparatorProperty());
+
+        // Add sorted (and filtered) data to the table.
+        keyTable.setItems(sortedKeyList);
     }
 
     // Consider it prepareKeyList reversed
@@ -141,7 +168,6 @@ public class Interface extends Application {
 
         // Search function implementation with FilteredList
         // Adopted from the tutorial at http://code.makery.ch/blog/javafx-8-tableview-sorting-filtering/
-        FilteredList<Key> filteredKeyList = new FilteredList<>(keyList, p -> true);
 
         // Enter query here!
         TextField searchField = new TextField();
@@ -157,7 +183,6 @@ public class Interface extends Application {
         // Bundle searchField and 'clear' button together
         HBox searchBox = new HBox(searchField, clearSeachButton);
         searchBox.setSpacing(5);
-
 
         searchField.textProperty().addListener(((observable, oldValue, newValue) -> {
             filteredKeyList.setPredicate(key -> {
@@ -178,15 +203,6 @@ public class Interface extends Application {
                 return false;
             });
         }));
-
-        // Wrap the FilteredList in a SortedList.
-        SortedList<Key> sortedKeyList = new SortedList<>(filteredKeyList);
-
-        // Bind the SortedList comparator to the TableView comparator.
-        sortedKeyList.comparatorProperty().bind(keyTable.comparatorProperty());
-
-        // Add sorted (and filtered) data to the table.
-        keyTable.setItems(sortedKeyList);
 
         // MenuBar is here!
         MenuBar menuBar = new MenuBar();
@@ -264,9 +280,16 @@ public class Interface extends Application {
             updateLocale(primaryStage, gameField, keyField, notesField, searchField);
         });
 
-
         // Assemble the menu bar
         menuBar.getMenus().addAll(fileMenu, editMenu);
+
+        // Confirm quit when user clicks the close button on top right
+        primaryStage.setOnCloseRequest(event -> {
+            if (ShowPrompt.confirmQuit())
+                primaryStage.close();
+            else
+                event.consume();
+        });
 
 
         // Add columns to the table and associate them with ObservableList

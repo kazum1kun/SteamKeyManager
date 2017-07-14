@@ -30,6 +30,7 @@ public final class FileParser {
                 System.getProperty("user.home") + "/Desktop"));
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter(L10N.get("string_fileChooser_filter_txt"), "*.txt"),
+                new FileChooser.ExtensionFilter(L10N.get("string_fileChooser_filter_excel"), "*.xlsx"),
                 new FileChooser.ExtensionFilter(L10N.get("string_fileChooser_filter_allFiles"), "*.*")
         );
 
