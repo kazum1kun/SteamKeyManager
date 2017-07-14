@@ -73,6 +73,9 @@ public class Interface extends Application {
                 default:        // Default to plain text file
                     keyList = FileParser.parseAndGet(selectedFile);
             }
+
+            // Update the title of app when a file is loaded
+            stage.setTitle(L10N.get("string_mainUI_appName") + " - " + userFile.getPath());
         } else {
             keyList = FileParser.getEmpty();
         }
