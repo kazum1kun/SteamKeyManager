@@ -1,5 +1,4 @@
 import Utils.L10N;
-
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -9,7 +8,13 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -17,9 +22,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
 import org.apache.commons.io.FilenameUtils;
+
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Locale;
 
 /**
@@ -201,10 +210,8 @@ public class Interface extends Application {
                 if (key.getGame().toLowerCase().contains(lowerCaseQuery))
                     return true;
                     // Query matches a notes
-                else if (key.getNotes().toLowerCase().contains(lowerCaseQuery))
-                    return true;
+                else return key.getNotes().toLowerCase().contains(lowerCaseQuery);
                 // Query matches nothing
-                return false;
             });
         }));
 
@@ -434,6 +441,7 @@ public class Interface extends Application {
             final MenuItem removeRow = L10N.menuItemForKey("string_contextMenu_remove");
             final MenuItem copyKey = L10N.menuItemForKey("string_contextMenu_copy");
             final MenuItem copyKeyAndRemove = L10N.menuItemForKey("string_contextMenu_copyAndRemove");
+            final MenuItem viewInSteam = L10N.menuItemForKey("string_contextMenu_viewInSteam");
 
 
             // Listener for removing a row
@@ -475,6 +483,22 @@ public class Interface extends Application {
 //                keyTable.getItems().remove(row.getItem());
             });
 
+            // Listener for viewing a game in Steam
+            viewInSteam.setOnAction((ActionEvent event) -> {
+                int selectedRow = keyTable.getSelectionModel().getSelectedIndex();
+                String gameName = keyTable.getItems().get(selectedRow).getGame();
+                String steamURL = Utils.WebParser.findURLOfGame(gameName, L10N.getLocale().getLanguage());
+                // Get system desktop
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.browse(new URL(steamURL).toURI());
+                } catch (URISyntaxException ex) {
+                    System.out.println("Bad URL!!");
+                } catch (IOException ex) {
+                    System.out.println("IO Exception");
+                }
+            });
+
             // Commit change on focus lost
             keyTable.setOnKeyPressed(event -> {
                 TablePosition<Key, ?> pos = keyTable.getFocusModel().getFocusedCell();
@@ -485,7 +509,7 @@ public class Interface extends Application {
 
 
             // Assemble the menu
-            cm.getItems().addAll(removeRow, copyKey, copyKeyAndRemove);
+            cm.getItems().addAll(removeRow, copyKey, copyKeyAndRemove, viewInSteam);
 
             // Set the remove option only show when the row is not empty
             row.contextMenuProperty().bind(

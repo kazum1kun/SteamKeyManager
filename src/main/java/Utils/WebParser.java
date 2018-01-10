@@ -17,9 +17,9 @@ import java.net.URLEncoder;
 /**
  * Contains all HTML related utilities
  */
-final class WebParser {
+public final class WebParser {
     // Get the Steam Store URL that corresponds to the name of the game
-    static String findURLOfGame(String game, String lang) {
+    public static String findURLOfGame(String game, String lang) {
         // Convert the name string to URI-safe letters
         try {
             game = URLEncoder.encode(game, "UTF-8");
@@ -27,21 +27,24 @@ final class WebParser {
             // Seriously, does there exist any modern platform that have not made it to UTF-8 yet??
         }
 
-        String searchURL = "";
+        String searchURL;
         // Put together the base search URL for the game (with appropriate language and region)
         switch (lang) {
-            case "en_US":
+            case "en":
                 searchURL = "http://store.steampowered.com/search/suggest?term=" + game +
                         "&f=games&cc=US&l=english&no_violence=0&no_sex=0";
                 break;
-            case "zh_CN":
+            case "zh":
                 searchURL = "http://store.steampowered.com/search/suggest?term=" + game +
                         "&f=games&cc=CN&l=chinese&no_violence=0&no_sex=0";
                 break;
-            case "ja_JP":
+            case "ja":
                 searchURL = "http://store.steampowered.com/search/suggest?term=" + game +
                         "&f=games&cc=JP&l=japanese&no_violence=0&no_sex=0";
                 break;
+            default:
+                searchURL = "";
+
         }
 
         // Alright, it turns out Jsoup cannot fetch the complete web page for me (even this simple one like this!!)
