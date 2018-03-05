@@ -8,23 +8,20 @@ repositories {
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.12'
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-    compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.6'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.9-rc'
     // https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.19.3'
+    compile group: 'org.xerial', name: 'sqlite-jdbc', version: '3.21.0.1'
     // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17-beta1'
+    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.3'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.11.2'
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
-    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.3'
-
-}
-
-jar {
-    manifest.attributes 'Main-Class': 'Interface'
-    from configurations.compile.collect { zipTree it }
+    compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
+    // https://mvnrepository.com/artifact/com.google.dagger/dagger
+    compile group: 'com.google.dagger', name: 'dagger', version: '2.14.1'
+    // https://mvnrepository.com/artifact/junit/junit
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }

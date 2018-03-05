@@ -18,6 +18,8 @@ import java.net.URLEncoder;
  * Contains all HTML related utilities
  */
 public final class WebParser {
+    private static HttpClient client = HttpClientBuilder.create().build();
+
     // Get the Steam Store URL that corresponds to the name of the game
     public static String findURLOfGame(String game, String lang) {
         // Convert the name string to URI-safe letters
@@ -51,7 +53,6 @@ public final class WebParser {
         // So I first get the web page with Apache HttpClient, then parse it with Jsoup
         // Finally get the very URL we wanted
         HttpGet request = new HttpGet(searchURL);
-        HttpClient client = HttpClientBuilder.create().build();
         String entityContents = "";
         try {
             HttpResponse response = client.execute(request);
