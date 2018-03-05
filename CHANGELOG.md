@@ -1,5 +1,9 @@
 # Changelog
 
+### Version 0.2.1-alpha
+Released Mar 4, 2018
+- ~(minor) Fixed occasional NPE issue with "Show in Steam..." context menu
+
 ### Version 0.2.0-alpha
 Released Jul 12, 2017
 - +(major) Search functionality added
