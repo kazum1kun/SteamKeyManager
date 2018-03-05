@@ -1,9 +1,11 @@
+package Model;
+
 import javafx.beans.property.SimpleStringProperty;
 
 
 /**
  * Class representing individual entries
- * Key format version 1
+ * Model.Key format version 1
  *
  * @author Xuanli Lin
  * @version 0.0.5-alpha
@@ -15,7 +17,7 @@ public class Key {
     private SimpleStringProperty notes;
 
     // Default constructor
-    Key(String game, String key, String notes){
+    public Key(String game, String key, String notes) {
         this.game = new SimpleStringProperty(game);
         this.key = new SimpleStringProperty(key);
         this.notes = new SimpleStringProperty(notes);
@@ -49,7 +51,7 @@ public class Key {
 
     @Override
     public String toString() {
-        return "Key{" +
+        return "Model.Key{" +
                 "game=" + game +
                 ", key=" + key +
                 ", notes=" + notes +

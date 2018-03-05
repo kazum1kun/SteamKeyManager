@@ -1,3 +1,5 @@
+package Interface;
+
 import javafx.event.Event;
 import javafx.scene.control.*;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -18,7 +20,7 @@ public class EditCell<S, T> extends TableCell<S, T> {
     /**
      * Convenience converter that does nothing (converts Strings to themselves and vice-versa...).
      */
-    public static final StringConverter<String> IDENTITY_CONVERTER = new StringConverter<String>() {
+    private static final StringConverter<String> IDENTITY_CONVERTER = new StringConverter<>() {
 
         @Override
         public String toString(String object) {
@@ -37,7 +39,7 @@ public class EditCell<S, T> extends TableCell<S, T> {
     // Converter for converting the text in the text field to the user type, and vice-versa:
     private final StringConverter<T> converter;
 
-    public EditCell(StringConverter<T> converter) {
+    private EditCell(StringConverter<T> converter) {
         this.converter = converter;
 
         itemProperty().addListener((obx, oldItem, newItem) -> {
@@ -50,9 +52,7 @@ public class EditCell<S, T> extends TableCell<S, T> {
         setGraphic(textField);
         setContentDisplay(ContentDisplay.TEXT_ONLY);
 
-        textField.setOnAction(evt -> {
-            commitEdit(this.converter.fromString(textField.getText()));
-        });
+        textField.setOnAction(evt -> commitEdit(this.converter.fromString(textField.getText())));
         textField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
             if (!isNowFocused) {
                 commitEdit(this.converter.fromString(textField.getText()));
@@ -82,10 +82,10 @@ public class EditCell<S, T> extends TableCell<S, T> {
     /**
      * Convenience method for creating an EditCell for a String value.
      *
-     * @return
+     * @return EditCell
      */
     public static <S> EditCell<S, String> createStringEditCell() {
-        return new EditCell<S, String>(IDENTITY_CONVERTER);
+        return new EditCell<>(IDENTITY_CONVERTER);
     }
 
 
@@ -117,7 +117,7 @@ public class EditCell<S, T> extends TableCell<S, T> {
             if (table != null) {
                 TableColumn<S, T> column = getTableColumn();
                 CellEditEvent<S, T> event = new CellEditEvent<>(table,
-                        new TablePosition<S, T>(table, getIndex(), column),
+                        new TablePosition<>(table, getIndex(), column),
                         TableColumn.editCommitEvent(), item);
                 Event.fireEvent(column, event);
             }

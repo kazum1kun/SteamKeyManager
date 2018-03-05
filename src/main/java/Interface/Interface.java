@@ -1,4 +1,10 @@
-import Utils.L10N;
+package Interface;
+
+import Model.Key;
+import Utils.Excel.ExcelOp;
+import Utils.FileRw.FileParser;
+import Utils.FileRw.FileWriter;
+import Utils.Net.WebParser;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
@@ -32,7 +38,7 @@ import java.net.URL;
 import java.util.Locale;
 
 /**
- * Main interface class of the Steam Key Manager
+ * Main interface class of the Steam Model.Key Manager
  *
  * @author Xuanli Lin
  * @version 0.2.0-alpha
@@ -45,18 +51,12 @@ public class Interface extends Application {
     private static ObservableList<Key> keyList;
     // Filtered keyList based on the keyList
     private static FilteredList<Key> filteredKeyList;
-    // Sorted list that wraps filtered list
-    private static SortedList<Key> sortedKeyList;
     // The File user chosen
     private static File userFile = null;
     // Current language, default to system locale (EN if unsupported)
     private static Locale currentLocale = L10N.getDefaultLocale();
     // Default resource bundle
 //    private static ResourceBundle lang = null;
-
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     // Prompt user to choose a file and attempt to parse it
     private static void prepareKeyList(Stage stage) {
@@ -94,7 +94,7 @@ public class Interface extends Application {
         filteredKeyList = new FilteredList<>(keyList, p -> true);
 
         // Wrap the FilteredList in a SortedList.
-        sortedKeyList = new SortedList<>(filteredKeyList);
+        SortedList<Key> sortedKeyList = new SortedList<>(filteredKeyList);
 
         // Bind the SortedList comparator to the TableView comparator.
         sortedKeyList.comparatorProperty().bind(keyTable.comparatorProperty());
@@ -121,6 +121,7 @@ public class Interface extends Application {
         // Detect the extension of the file and call appropriate file writers
         switch (FilenameUtils.getExtension(userFile.getPath())) {
             case "txt": // Plain text file
+                assert dest != null;
                 FileWriter.saveToText(dest, keyList);
                 break;
             case "xlsx": // MS Excel file
@@ -130,6 +131,7 @@ public class Interface extends Application {
                 // Reserved
                 break;
             default:    // Default to text file
+                assert dest != null;
                 FileWriter.saveToText(dest, keyList);
                 break;
         }
@@ -137,7 +139,6 @@ public class Interface extends Application {
 
     private static void updateLocale(Stage stage, TextField... textFields) {
         // This would set locale for most areas
-//        lang = ResourceBundle.getBundle("language.lang", currentLocale);
         L10N.setLocale(currentLocale);
 
         // Some cannot be set (for now), update them manually
@@ -153,9 +154,6 @@ public class Interface extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Multi-Language support
-//        lang = ResourceBundle.getBundle("language.lang", currentLocale);
-
         // Populate an empty ObservableList on program start
         keyList = FileParser.getEmpty();
 
@@ -197,43 +195,37 @@ public class Interface extends Application {
         HBox searchBox = new HBox(searchField, clearSeachButton);
         searchBox.setSpacing(5);
 
-        searchField.textProperty().addListener(((observable, oldValue, newValue) -> {
-            filteredKeyList.setPredicate(key -> {
-                // Display all keys if search field is empty
-                if (newValue == null || newValue.isEmpty()) {
-                    return true;
-                }
+        searchField.textProperty().addListener(((observable, oldValue, newValue) ->
+                filteredKeyList.setPredicate(key -> {
+                    // Display all keys if search field is empty
+                    if (newValue == null || newValue.isEmpty()) {
+                        return true;
+                    }
 
-                // Compare search query with game names and notes
-                String lowerCaseQuery = newValue.toLowerCase();
-                // Query matches a game
-                if (key.getGame().toLowerCase().contains(lowerCaseQuery))
-                    return true;
+                    // Compare search query with game names and notes
+                    String lowerCaseQuery = newValue.toLowerCase();
+                    // Query matches a game
                     // Query matches a notes
-                else return key.getNotes().toLowerCase().contains(lowerCaseQuery);
+                    return key.getGame().toLowerCase().contains(lowerCaseQuery) ||
+                            key.getNotes().toLowerCase().contains(lowerCaseQuery);
                 // Query matches nothing
-            });
-        }));
+                })));
 
         // MenuBar is here!
         MenuBar menuBar = new MenuBar();
 
         // ---- File
-//        Menu fileMenu = new Menu(lang.getString("string_menuBar_file"));
         Menu fileMenu = L10N.menuForKey("string_menuBar_file");
         // -------- Open
-//        MenuItem openItem = new MenuItem(lang.getString("string_menuBar_file_open"));
         MenuItem openItem = L10N.menuItemForKey("string_menuBar_file_open");
         openItem.setOnAction((ActionEvent event) -> prepareKeyList(primaryStage));
         // -------- Save
-//        MenuItem saveItem = new MenuItem(lang.getString("string_menuBar_file_save"));
         MenuItem saveItem = L10N.menuItemForKey("string_menuBar_file_save");
         saveItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage, 1));
         // -------- Save as
         MenuItem saveAsItem = L10N.menuItemForKey("string_menuBar_file_saveAs");
         saveAsItem.setOnAction((ActionEvent event) -> saveKeyList(primaryStage, 0));
         // -------- Exit
-//        MenuItem closeItem = new MenuItem(lang.getString("string_menuBar_file_exit"));
         MenuItem closeItem = L10N.menuItemForKey("string_menuBar_file_exit");
         closeItem.setOnAction((ActionEvent event) -> {
             if (ShowPrompt.confirmQuit())
@@ -243,20 +235,16 @@ public class Interface extends Application {
         fileMenu.getItems().addAll(openItem, saveItem, saveAsItem, closeItem);
 
         // ---- Edit
-//        Menu editMenu = new Menu(lang.getString("string_menuBar_edit"));
         Menu editMenu = L10N.menuForKey("string_menuBar_edit");
 
         // -------- Language
-//        Menu langMenu = new Menu(lang.getString("string_menuBar_edit_language"));
         Menu langMenu = L10N.menuForKey("string_menuBar_edit_language");
         final ToggleGroup langGroup = new ToggleGroup();
         // ------------ English
-//        RadioMenuItem englishItem = new RadioMenuItem(lang.getString("string_menuBar_edit_language_en"));
         RadioMenuItem englishItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_en");
         englishItem.setUserData(Locale.ENGLISH);
         englishItem.setToggleGroup(langGroup);
         // ------------ Chinese Simplified
-//        RadioMenuItem simpChineseItem = new RadioMenuItem(lang.getString("string_menuBar_edit_language_zh_CN"));
         RadioMenuItem simpChineseItem = L10N.radioMenuItemForKey("string_menuBar_edit_language_zh_CN");
         simpChineseItem.setUserData(Locale.SIMPLIFIED_CHINESE);
         simpChineseItem.setToggleGroup(langGroup);
@@ -305,19 +293,16 @@ public class Interface extends Application {
 
         // Add columns to the table and associate them with ObservableList
         // COLUMN WIDTHS
-//        TableColumn gameCol = new TableColumn(lang.getString("string_mainUI_game"));
         TableColumn gameCol = L10N.tableColumnForKey("string_mainUI_game");
         gameCol.setMinWidth(150);
         gameCol.setPrefWidth(180);
         gameCol.setCellValueFactory(new PropertyValueFactory<Key, String>("game"));
 
-//        TableColumn keyCol = new TableColumn(lang.getString("string_mainUI_key"));
         TableColumn keyCol = L10N.tableColumnForKey("string_mainUI_key");
         keyCol.setMinWidth(135);
         keyCol.setMaxWidth(135);
         keyCol.setCellValueFactory(new PropertyValueFactory<Key, String>("key"));
 
-//        TableColumn notesCol = new TableColumn(lang.getString("string_mainUI_notes"));
         TableColumn notesCol = L10N.tableColumnForKey("string_mainUI_notes");
         notesCol.setMinWidth(100);
         notesCol.setCellValueFactory(new PropertyValueFactory<Key, String>("notes"));
@@ -328,20 +313,17 @@ public class Interface extends Application {
         keyTable.setPrefHeight(1000);
 
         // Implement cell editing
-        //gameCol.setCellFactory(TextFieldTableCell.forTableColumn());      -> Old implementation
         gameCol.setCellFactory(column -> EditCell.createStringEditCell());
         keyCol.setCellFactory(column -> EditCell.createStringEditCell());
         notesCol.setCellFactory(column -> EditCell.createStringEditCell());
 
         // Add textFields to add a new key. Make them no wider than the table
-//        TextField gameField = new TextField();
         gameField.setMaxWidth(gameCol.getMaxWidth());
         gameField.setPromptText(L10N.get("string_mainUI_game"));
-//        TextField keyField = new TextField();
+
         keyField.setMaxWidth(keyCol.getMaxWidth());
         keyField.setPromptText(L10N.get("string_mainUI_key"));
 
-//        TextField notesField = new TextField();
         notesField.setMaxWidth(notesCol.getPrefWidth());
         notesField.setPromptText(L10N.get("string_mainUI_notes"));
 
@@ -355,47 +337,32 @@ public class Interface extends Application {
         Button addButton = L10N.buttonForKey("string_mainUI_add");
 
         // Change content of table on commit
+        // Update the value of the game cell after users finish editing
         gameCol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
-                    @Override
-                    // Update the value of the game cell after users finish editing
-                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
-                        (event.getTableView().getItems().get(
-                                event.getTablePosition().getRow())
-                        ).setGame(event.getNewValue());
-                    }
-                }
+                (EventHandler<TableColumn.CellEditEvent<Key, String>>) event -> (event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())
+                ).setGame(event.getNewValue())
         );
 
+        // Update the value of the game cell after users finish editing
         keyCol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
-                    @Override
-                    // Update the value of the game cell after users finish editing
-                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
-                        (event.getTableView().getItems().get(
-                                event.getTablePosition().getRow())
-                        ).setKey(event.getNewValue());
-                    }
-                }
+                (EventHandler<TableColumn.CellEditEvent<Key, String>>) event -> (event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())
+                ).setKey(event.getNewValue())
         );
 
+        // Update the value of the game cell after users finish editing
         notesCol.setOnEditCommit(
-                new EventHandler<TableColumn.CellEditEvent<Key,String>>() {
-                    @Override
-                    // Update the value of the game cell after users finish editing
-                    public void handle(TableColumn.CellEditEvent<Key, String> event) {
-                        (event.getTableView().getItems().get(
-                                event.getTablePosition().getRow())
-                        ).setNotes(event.getNewValue());
-                    }
-                }
+                (EventHandler<TableColumn.CellEditEvent<Key, String>>) event -> (event.getTableView().getItems().get(
+                        event.getTablePosition().getRow())
+                ).setNotes(event.getNewValue())
         );
 
         // Add the input to the list
         addButton.setOnAction(event -> {
             // Add the key only if at least game and key is present
             if (!gameField.getText().isEmpty() && !keyField.getText().isEmpty()) {
-                // Create a new Key and add it to keyList
+                // Create a new Model.Key and add it to keyList
                 Key key = new Key(
                         gameField.getText(),
                         keyField.getText(),
@@ -410,8 +377,8 @@ public class Interface extends Application {
             }
             // Database Test
 //            try {
-//                KeyDao mysql = new KeyDao(Utils.DBTool.MYSQL);
-//                KeyDao sqlite = new KeyDao(Utils.DBTool.SQLITE);
+//                Utils.Db.KeyDao mysql = new Utils.Db.KeyDao(Utils.Db.DBTool.MYSQL);
+//                Utils.Db.KeyDao sqlite = new Utils.Db.KeyDao(Utils.Db.DBTool.SQLITE);
 //
 ////                mysql.insertKey(key);
 ////                sqlite.insertKey(key);
@@ -435,9 +402,6 @@ public class Interface extends Application {
         keyTable.setRowFactory(tableView -> {
             final TableRow<Key> row = new TableRow<>();
             final ContextMenu cm = new ContextMenu();
-//            final MenuItem removeRow = new MenuItem(lang.getString("string_contextMenu_remove"));
-//            final MenuItem copyKey = new MenuItem(lang.getString("string_contextMenu_copy"));
-//            final MenuItem copyKeyAndRemove = new MenuItem(lang.getString("string_contextMenu_copyAndRemove"));
             final MenuItem removeRow = L10N.menuItemForKey("string_contextMenu_remove");
             final MenuItem copyKey = L10N.menuItemForKey("string_contextMenu_copy");
             final MenuItem copyKeyAndRemove = L10N.menuItemForKey("string_contextMenu_copyAndRemove");
@@ -445,7 +409,6 @@ public class Interface extends Application {
 
 
             // Listener for removing a row
-//            removeRow.setOnAction((ActionEvent event) -> keyTable.getItems().remove(row.getItem()));
             // Method updated to reflect changes on the VC model
             removeRow.setOnAction((ActionEvent event) -> {
                 Key selectedKey = keyTable.getSelectionModel().getSelectedItem();
@@ -480,14 +443,13 @@ public class Interface extends Application {
                 if (selectedKey != null) {
                     keyList.remove(selectedKey);
                 }
-//                keyTable.getItems().remove(row.getItem());
             });
 
             // Listener for viewing a game in Steam
             viewInSteam.setOnAction((ActionEvent event) -> {
                 int selectedRow = keyTable.getSelectionModel().getSelectedIndex();
                 String gameName = keyTable.getItems().get(selectedRow).getGame();
-                String steamURL = Utils.WebParser.findURLOfGame(gameName, L10N.getLocale().getLanguage());
+                String steamURL = WebParser.findURLOfGame(gameName, L10N.getLocale().getLanguage());
                 // Get system desktop
                 Desktop desktop = Desktop.getDesktop();
                 try {
@@ -501,7 +463,7 @@ public class Interface extends Application {
 
             // Commit change on focus lost
             keyTable.setOnKeyPressed(event -> {
-                TablePosition<Key, ?> pos = keyTable.getFocusModel().getFocusedCell();
+                TablePosition pos = keyTable.getFocusModel().getFocusedCell();
                 if (pos != null && event.getCode().isLetterKey()) {
                     keyTable.edit(pos.getRow(), pos.getTableColumn());
                 }

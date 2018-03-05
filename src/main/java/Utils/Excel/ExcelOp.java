@@ -1,3 +1,7 @@
+package Utils.Excel;
+
+import Interface.ShowPrompt;
+import Model.Key;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.poi.POIXMLProperties;
@@ -24,7 +28,7 @@ public final class ExcelOp {
     public static void saveToExcel(File dest, ObservableList<Key> keys) {
         /* Excel format version 1 is similar to the following
          *   -----------------------------------------------------
-         * 0 |       Game      |       Key        |    Notes     |
+         * 0 |       Game      |       Model.Key        |    Notes     |
          *   -----------------------------------------------------
          * 1 | Pseudo Game     | 11111-22222-33333|  Some notes  |
          *   -----------------------------------------------------
@@ -42,7 +46,7 @@ public final class ExcelOp {
         Cell headerRowCell = headerRow.createCell(0);
         headerRowCell.setCellValue("Games");
         headerRowCell = headerRow.createCell(1);
-        headerRowCell.setCellValue("Key");
+        headerRowCell.setCellValue("Model.Key");
         headerRowCell = headerRow.createCell(2);
         headerRowCell.setCellValue("Notes");
 
@@ -77,7 +81,7 @@ public final class ExcelOp {
     }
 
     // Excel parser
-    public static void parseExcel(File file) {
+    private static void parseExcel(File file) {
         try {
             FileInputStream fis = new FileInputStream(file);
 
@@ -117,9 +121,9 @@ public final class ExcelOp {
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
 
-            // Compile cell data to Key instances
+            // Compile cell data to Model.Key instances
             keys.add(new Key(row.getCell(0).getStringCellValue(),   // Game
-                    row.getCell(1).getStringCellValue(),            // Key
+                    row.getCell(1).getStringCellValue(),            // Model.Key
                     row.getCell(2).getStringCellValue()));          // Notes
         }
     }

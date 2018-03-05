@@ -1,4 +1,5 @@
-import Utils.L10N;
+package Interface;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -8,16 +9,16 @@ import java.util.Optional;
 
 /**
  * This class contains nothing but bunch of prompts
- * Separated from main Interface class since ver 0.2.0
+ * Separated from main Interface.Interface class since ver 0.2.0
  *
  * @author Xuanli Lin
  * @version 0.2.0-alpha
  * @since 0.2.0-alpha
  */
-final class ShowPrompt {
+public final class ShowPrompt {
 
     // Prompt for to file I/O errors
-    static void fileReadError(String pathToFile, int context) {
+    public static void fileReadError(String pathToFile, int context) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(L10N.get("string_alert_fileReadError_title"));
         alert.setHeaderText(L10N.get("string_alert_fileReadError_header"));
@@ -33,7 +34,7 @@ final class ShowPrompt {
     }
 
     // Prompt for parsing errors
-    static void fileParseError(String pathToFile, int context) {
+    public static void fileParseError(String pathToFile, int context) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(L10N.get("string_alert_fileParseError_title"));
         alert.setHeaderText(L10N.get("string_alert_fileParseError_header"));
@@ -46,7 +47,7 @@ final class ShowPrompt {
     }
 
     // Prompt to ask whether user want to analyze the file
-    static boolean oldFormat() {
+    public static boolean oldFormat() {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(L10N.get("string_alert_oldFormat_title"));
         alert.setHeaderText(L10N.get("string_alert_oldFormat_header"));
@@ -57,7 +58,7 @@ final class ShowPrompt {
     }
 
     // Let user know the parse results
-    static void analysisReport(int ok, int failed) {
+    public static void analysisReport(int ok, int failed) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(L10N.get("string_alert_analysisReport_title"));
         alert.setHeaderText(L10N.get("string_alert_analysisReport_header",
@@ -67,7 +68,7 @@ final class ShowPrompt {
     }
 
     // Prompt for file creation errors
-    static void fileCreateError(String pathToFile) {
+    public static void fileCreateError(String pathToFile) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(L10N.get("string_alert_fileCreateError_title"));
         alert.setHeaderText(L10N.get("string_alert_fileCreateError_header"));
@@ -78,7 +79,7 @@ final class ShowPrompt {
     }
 
     // Prompt for a successful save
-    static void fileSaved(String pathToFile) {
+    public static void fileSaved(String pathToFile) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(L10N.get("string_alert_fileSaved_title"));
         alert.setHeaderText(null);
@@ -89,7 +90,7 @@ final class ShowPrompt {
     }
 
     // Prompt for file save errors
-    static void fileSaveError(String pathToFile) {
+    public static void fileSaveError(String pathToFile) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle(L10N.get("string_alert_fileSaveError_title"));
         alert.setHeaderText(L10N.get("string_alert_fileSaveError_header",
@@ -101,7 +102,7 @@ final class ShowPrompt {
     }
 
     // Ask user whether they want to purge the list and load a new file
-    static boolean confirmLoad(Stage stage) {
+    public static boolean confirmLoad(Stage stage) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(L10N.get("string_alert_confirmLoad_title"));
         alert.setHeaderText(L10N.get("string_alert_confirmLoad_header"));
@@ -118,7 +119,7 @@ final class ShowPrompt {
         return (result.get() == ButtonType.YES);
     }
 
-    static boolean confirmQuit() {
+    public static boolean confirmQuit() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle(L10N.get("string_alert_confirmQuit_title"));
         alert.setHeaderText(L10N.get("string_alert_confirmQuit_header"));

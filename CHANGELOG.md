@@ -28,7 +28,7 @@ This update in fact included more features than original 0.1.0. Enjoy!
 
 ### Version 0.0.5-1-alpha
 Released on Jun 26, 2017
-- +(minor) Added "Copy Key" and "Copy Key and Remove" to the context menu
+- +(minor) Added "Copy Model.Key" and "Copy Model.Key and Remove" to the context menu
 - ~(minor) Tweaked changelog format
 
 ### Version 0.0.5-alpha

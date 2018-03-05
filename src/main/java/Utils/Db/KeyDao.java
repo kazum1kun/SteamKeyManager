@@ -1,10 +1,12 @@
-import Utils.DBTool;
+package Utils.Db;
+
+import Model.Key;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 /**
- * Key Database Access Operation
+ * Model.Key Database Access Operation
  *
  * @author Dontcampy
  */
@@ -14,7 +16,7 @@ public class KeyDao {
 
     /**
      *
-     * @param dbType = Utils.DBTool.MYSQL, Utils.DBTool.SQLITE ......
+     * @param dbType = Utils.Db.DBTool.MYSQL, Utils.Db.DBTool.SQLITE ......
      * @throws SQLException
      */
     public KeyDao(int dbType) throws SQLException {
@@ -123,7 +125,7 @@ public class KeyDao {
         DBTool.closeDB();
     }
 
-    // Insert function overload for Key.class
+    // Insert function overload for Model.Key.class
     public synchronized void insertKey(Key key) throws SQLException {
         Connection conn = DBTool.getConnection(dbType);
         String sqlStr = "insert into gamekeys(gamename, gamekey, note) values(?, ?, ?)";
@@ -155,7 +157,7 @@ public class KeyDao {
         DBTool.closeDB();
     }
 
-    // Insert function overload for Key.class
+    // Insert function overload for Model.Key.class
     public synchronized void delKey(Key key) throws SQLException {
         Connection conn = DBTool.getConnection(dbType);
         String sqlStr = "delete from gamekeys where gamekey = ?";

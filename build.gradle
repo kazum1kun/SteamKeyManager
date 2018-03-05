@@ -1,10 +1,22 @@
 group 'com.linstreasure'
-version '0.2.0-alpha'
+version = '0.2.1-alpha'
 
 apply plugin: 'java'
 
 repositories {
     mavenCentral()
+}
+
+// Create a single Jar with all dependencies
+task fullJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Steam Key Manager',
+                'Implementation-Version': version,
+                'Main-Class': 'Interface'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
 dependencies {
@@ -20,8 +32,6 @@ dependencies {
     compile group: 'org.jsoup', name: 'jsoup', version: '1.11.2'
     // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
     compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.5'
-    // https://mvnrepository.com/artifact/com.google.dagger/dagger
-    compile group: 'com.google.dagger', name: 'dagger', version: '2.14.1'
     // https://mvnrepository.com/artifact/junit/junit
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }

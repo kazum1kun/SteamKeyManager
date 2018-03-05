@@ -1,4 +1,4 @@
-package Utils;
+package Interface;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
@@ -35,7 +35,7 @@ public final class L10N {
      *
      * @return List of Locale objects.
      */
-    public static List<Locale> getSupportedLocales() {
+    private static List<Locale> getSupportedLocales() {
         return new ArrayList<>(Arrays.asList(Locale.ENGLISH, Locale.SIMPLIFIED_CHINESE, Locale.JAPANESE));
     }
 
@@ -58,7 +58,7 @@ public final class L10N {
         Locale.setDefault(locale);
     }
 
-    public static ObjectProperty<Locale> localeProperty() {
+    private static ObjectProperty<Locale> localeProperty() {
         return locale;
     }
 

@@ -1,4 +1,8 @@
-import Utils.L10N;
+package Utils.FileRw;
+
+import Interface.L10N;
+import Interface.ShowPrompt;
+import Model.Key;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
@@ -12,7 +16,7 @@ import java.util.regex.Pattern;
 
 /**
  * Parse a txt file and return a corresponding ObservableList
- * Parser engine version 1, supports Key format version 1 and older format
+ * Parser engine version 1, supports Model.Key format version 1 and older format
  *
  * @author Xuanli Lin
  * @version 0.0.5-alpha
@@ -38,7 +42,7 @@ public final class FileParser {
     }
 
     // Read in the first line and decide what to do
-    public static void parse(File file) {
+    private static void parse(File file) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(
                 new FileInputStream(file), "utf-8"))) {
             String firstLine = br.readLine();
@@ -74,7 +78,7 @@ public final class FileParser {
             // Omit the first line (which contains meta info)
             br.readLine();
 
-            // Compile strings into corresponding Key objects
+            // Compile strings into corresponding Model.Key objects
             String line;
             while ((line = br.readLine()) != null) {
                 List<String> key = Arrays.asList(line.split(";"));
@@ -165,12 +169,12 @@ public final class FileParser {
         return keys;
     }
     // Old proof-of-concept pre-populated ObservableList
-//    public static ObservableList<Key> get() {
-//        ObservableList<Key> val =
+//    public static ObservableList<Model.Key> get() {
+//        ObservableList<Model.Key> val =
 //                FXCollections.observableArrayList(
-//                        new Key("11111-22222-33333", "Puslum", ""),
-//                        new Key("ABCDE-FGHIJ-KLMNO", "Asco", "Null"),
-//                        new Key("QWERT-YUIOP-ASDFG", "HFHYFBYF", "FUKCD")
+//                        new Model.Key("11111-22222-33333", "Puslum", ""),
+//                        new Model.Key("ABCDE-FGHIJ-KLMNO", "Asco", "Null"),
+//                        new Model.Key("QWERT-YUIOP-ASDFG", "HFHYFBYF", "FUKCD")
 //                );
 //        return val;
 //    }

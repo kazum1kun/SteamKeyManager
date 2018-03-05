@@ -1,7 +1,7 @@
 # Steam Key Manager
 Simple JavaFX based GUI tool that helps organizing your Steam keys and redemption URLs (WIP)
 
-Latest release: [0.2.0-alpha]
+Latest release: [0.2.1-beta] at Mar 3, 2018
 
 **Native Japanese speaker wanted!!** Most of the Japanese texts are machine translated, please let me know how to make 
 them better!
@@ -24,11 +24,12 @@ Currently the file parser is very immature and can only recognize a very specifi
 I did attempt to include more delimiters into the SKM, but it ended up taking URLs apart, so I will come back to this later.
 
 ## Functions
-As of now, the Steam Key Manager supports:
+As of now, the Steam Model.Key Manager supports:
 - Add/Remove entries to the table
 - Add notes to entries
 - Sort by game or notes (or keys, if you prefer)
 - Search for game/notes
+- See a game in Steam
 - Edit an entry
 - Copy key to the system clipboard
 - Import keys from an existing text file
@@ -40,9 +41,8 @@ Here's a list of planned updates to the manager (priority ones marked in **bold*
 - Improved file parser (for Non-SKM formats)
 - Remark entries (e.g. important, for trade, redeemed)
 - Support for more formats (being worked on)
-    - @Dontcampy is working on SQL integration
+    - SQL
     - MS Excel (.xlsx)
-- See a game in Steam
 - Encrypt local storage
 - Bug fixes
 
@@ -53,7 +53,7 @@ I know for sure that my codes are still not perfect. Feel free to commend upon t
 ## Changelog
 [See here]
 
-[0.2.0-alpha]: <https://github.com/l19980623/SteamKeyManager/releases/tag/v0.2.0>
+[0.2.1-alpha]: <https://github.com/l19980623/SteamKeyManager/releases/tag/v0.2.1>
 [Issues]: <https://github.com/l19980623/SteamKeyManager/issues>
 [Releases]: <https://github.com/l19980623/SteamKeyManager/releases>
 [here]: <https://java.com/download>
