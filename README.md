@@ -1,7 +1,9 @@
 # An Important Update to the Project
-Thank you all for your support to the project. As you can see SKM in this stage is usable, but missing a few promised functionalities. Recently I skimmed through the project files and I can tell the way the project is structured makes it extremely difficult to maintain or modify. Since the SKM started while I am in sophomore year of college (while I was young and naive... lol), there are a few very bad practices in the code (like bad separation of concerns). Unless there is another total rewrite of code, and transition to FXML, any additions to the existing code just complicates the situation further.
+Thank you all for your support to the project. As you can see SKM in this stage is usable, but missing a few promised functionalities. Recently I skimmed through the project files and I can tell the way the project is structured makes it extremely difficult to maintain or modify. 
 
-That said, since I am to rewrite the project anyways, I am considering possibilities outside JavaFX framework. Right now [Kivy] (based on Python) looks very good to me, and I am studying possibilities to transform the project into Kivy.
+Since the SKM started while I am in sophomore year of college (while I was young and naive... lol), there are a few very bad practices in the code (like bad separation of concerns). Unless there is another total rewrite of code, and transition to FXML, any additions to the existing code just complicates the situation further.
+
+That said, since I am to rewrite the project anyways, I am considering possibilities outside JavaFX framework. Right now I'm learning [PyQt] (Python wrapper for Qt), and I believe PyQt would be a great improvement over JavaFX.
 
 Another planned feature to SKM is switching primary data storage from text files to database-based storage. Text files can be easily tempered, and a slight inconsistency can cause the file parser to fail in Java implementation.
 
@@ -67,4 +69,4 @@ I know for sure that my codes are still not perfect. Feel free to commend upon t
 [Releases]: <https://github.com/l19980623/SteamKeyManager/releases>
 [here]: <https://java.com/download>
 [See here]: <https://github.com/l19980623/SteamKeyManager/blob/master/CHANGELOG.md>
-[Kivy]: <https://kivy.org/#home>
+[PyQt]: <https://riverbankcomputing.com/software/pyqt/intro>
