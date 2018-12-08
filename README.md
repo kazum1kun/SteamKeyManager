@@ -1,21 +1,10 @@
 # An Important Update to the Project
-Thank you all for your support to the project. As you can see SKM in this stage is usable, but missing a few promised functionalities. Recently I skimmed through the project files and I can tell the way the project is structured makes it extremely difficult to maintain or modify. 
-
-Since the SKM started while I am in sophomore year of college (while I was young and naive... lol), there are a few very bad practices in the code (like bad separation of concerns). Unless there is another total rewrite of code, and transition to FXML, any additions to the existing code just complicates the situation further.
-
-That said, since I am to rewrite the project anyways, I am considering possibilities outside JavaFX framework. Right now I'm learning [PyQt] (Python wrapper for Qt), and I believe PyQt would be a great improvement over JavaFX.
-
-Another planned feature to SKM is switching primary data storage from text files to database-based storage. Text files can be easily tempered, and a slight inconsistency can cause the file parser to fail in Java implementation.
-
-Anyways, this is just a picture of what to come next. Right now I am very busy with school since the graduation is coming next month, but do stay tuned for updates. Thank you!
+As of December 2018, the development has moved to [QSteamKeyManager](https://github.com/l19980623/QSteamKeyManager), a Python/Qt rewrite of the project. The current project will no longer receive any update from me. Thank you for your support, and do check out the new project!
 
 # Steam Key Manager
 Simple JavaFX based GUI tool that helps organizing your Steam keys and redemption URLs (WIP)
 
 Latest release: [0.2.1-beta] at Mar 3, 2018
-
-**Native Japanese speaker wanted!!** Most of the Japanese texts are machine translated, please let me know how to make 
-them better!
 
 ## Intro & Motivation
 Hi all! Originally this GUI based tool was made for my own use only, but now I decided to publish it to Github as my "early Java projects". Nothing quite special, just a handy tool to deal with my ever-increasing pool of unused Steam keys.
